@@ -1,4 +1,4 @@
-package com.verygood.island.handler;
+package com.verygood.island.controller.handler;
 
 import com.verygood.island.entity.dto.ResultBean;
 import com.verygood.island.exception.bizException.BizException;
