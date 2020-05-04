@@ -9,7 +9,7 @@ import com.verygood.island.entity.Message;
  * </p>
  *
  * @author chaos
- * @since 2020-05-02
+ * @since 2020-05-04
  */
 public interface MessageService {
 
@@ -18,12 +18,12 @@ public interface MessageService {
      *
      * @param page     当前页数
      * @param pageSize 页的大小
-     * @param keyword  搜索关键词
+     * @param factor   搜索关键词
      * @return 返回mybatis-plus的Page对象,其中records字段为符合条件的查询结果
      * @author chaos
-     * @since 2020-05-02
+     * @since 2020-05-04
      */
-    Page<Message> listMessagesByPage(int page, int pageSize, String keyword);
+    Page<Message> listMessagesByPage(int page, int pageSize, String factor);
 
     /**
      * 根据id查询Message
@@ -31,7 +31,7 @@ public interface MessageService {
      * @param id 需要查询的Message的id
      * @return 返回对应id的Message对象
      * @author chaos
-     * @since 2020-05-02
+     * @since 2020-05-04
      */
     Message getMessageById(int id);
 
@@ -41,7 +41,7 @@ public interface MessageService {
      * @param message 需要插入的Message对象
      * @return 返回插入成功之后Message对象的id
      * @author chaos
-     * @since 2020-05-02
+     * @since 2020-05-04
      */
     int insertMessage(Message message);
 
@@ -51,7 +51,7 @@ public interface MessageService {
      * @param id 需要删除的Message对象的id
      * @return 返回被删除的Message对象的id
      * @author chaos
-     * @since 2020-05-02
+     * @since 2020-05-04
      */
     int deleteMessageById(int id);
 
@@ -61,7 +61,7 @@ public interface MessageService {
      * @param message 需要更新的Message对象
      * @return 返回被更新的Message对象的id
      * @author chaos
-     * @since 2020-05-02
+     * @since 2020-05-04
      */
     int updateMessage(Message message);
 
