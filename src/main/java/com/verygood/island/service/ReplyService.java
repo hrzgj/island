@@ -9,7 +9,7 @@ import com.verygood.island.entity.Reply;
  * </p>
  *
  * @author chaos
- * @since 2020-05-02
+ * @since 2020-05-04
  */
 public interface ReplyService {
 
@@ -18,12 +18,12 @@ public interface ReplyService {
      *
      * @param page     当前页数
      * @param pageSize 页的大小
-     * @param keyword  搜索关键词
+     * @param factor   搜索关键词
      * @return 返回mybatis-plus的Page对象,其中records字段为符合条件的查询结果
      * @author chaos
-     * @since 2020-05-02
+     * @since 2020-05-04
      */
-    Page<Reply> listReplysByPage(int page, int pageSize, String keyword);
+    Page<Reply> listReplysByPage(int page, int pageSize, String factor);
 
     /**
      * 根据id查询Reply
@@ -31,7 +31,7 @@ public interface ReplyService {
      * @param id 需要查询的Reply的id
      * @return 返回对应id的Reply对象
      * @author chaos
-     * @since 2020-05-02
+     * @since 2020-05-04
      */
     Reply getReplyById(int id);
 
@@ -41,7 +41,7 @@ public interface ReplyService {
      * @param reply 需要插入的Reply对象
      * @return 返回插入成功之后Reply对象的id
      * @author chaos
-     * @since 2020-05-02
+     * @since 2020-05-04
      */
     int insertReply(Reply reply);
 
@@ -51,7 +51,7 @@ public interface ReplyService {
      * @param id 需要删除的Reply对象的id
      * @return 返回被删除的Reply对象的id
      * @author chaos
-     * @since 2020-05-02
+     * @since 2020-05-04
      */
     int deleteReplyById(int id);
 
@@ -61,7 +61,7 @@ public interface ReplyService {
      * @param reply 需要更新的Reply对象
      * @return 返回被更新的Reply对象的id
      * @author chaos
-     * @since 2020-05-02
+     * @since 2020-05-04
      */
     int updateReply(Reply reply);
 

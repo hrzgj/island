@@ -11,32 +11,32 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
-* <p>
-* 回复 服务实现类
-* </p>
-*
-* @author chaos
-* @since 2020-05-02
-*/
+ * <p>
+ * 回复 服务实现类
+ * </p>
+ *
+ * @author chaos
+ * @since 2020-05-04
+ */
 @Slf4j
 @Service
 public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements ReplyService {
 
     @Override
-    public Page<Reply> listReplysByPage(int page, int pageSize, String keyword) {
-        log.info("正在执行分页查询reply: page = {} pageSize = {} keyword = {}",page,pageSize,keyword);
-        QueryWrapper<Reply> queryWrapper =  new QueryWrapper<Reply>().like("", keyword);
+    public Page<Reply> listReplysByPage(int page, int pageSize, String factor) {
+        log.info("正在执行分页查询reply: page = {} pageSize = {} factor = {}", page, pageSize, factor);
+        QueryWrapper<Reply> queryWrapper = new QueryWrapper<Reply>().like("", factor);
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
         Page<Reply> result = super.page(new Page<>(page, pageSize));
-        log.info("分页查询reply完毕: 结果数 = {} ",result.getRecords().size());
+        log.info("分页查询reply完毕: 结果数 = {} ", result.getRecords().size());
         return result;
     }
 
     @Override
     public Reply getReplyById(int id) {
-        log.info("正在查询reply中id为{}的数据",id);
+        log.info("正在查询reply中id为{}的数据", id);
         Reply reply = super.getById(id);
-        log.info("查询id为{}的reply{}",id,(null == reply?"无结果":"成功"));
+        log.info("查询id为{}的reply{}", id, (null == reply ? "无结果" : "成功"));
         return reply;
     }
 
@@ -44,7 +44,7 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements
     public int insertReply(Reply reply) {
         log.info("正在插入reply");
         if (super.save(reply)) {
-            log.info("插入reply成功,id为{}",reply.getReplyId());
+            log.info("插入reply成功,id为{}", reply.getReplyId());
             return reply.getReplyId();
         } else {
             log.error("插入reply失败");
@@ -54,24 +54,24 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements
 
     @Override
     public int deleteReplyById(int id) {
-        log.info("正在删除id为{}的reply",id);
+        log.info("正在删除id为{}的reply", id);
         if (super.removeById(id)) {
-            log.info("删除id为{}的reply成功",id);
+            log.info("删除id为{}的reply成功", id);
             return id;
         } else {
-            log.error("删除id为{}的reply失败",id);
+            log.error("删除id为{}的reply失败", id);
             throw new BizException("删除失败[id=" + id + "]");
         }
     }
 
     @Override
     public int updateReply(Reply reply) {
-        log.info("正在更新id为{}的reply",reply.getReplyId());
+        log.info("正在更新id为{}的reply", reply.getReplyId());
         if (super.updateById(reply)) {
-            log.info("更新d为{}的reply成功",reply.getReplyId());
+            log.info("更新d为{}的reply成功", reply.getReplyId());
             return reply.getReplyId();
         } else {
-            log.error("更新id为{}的reply失败",reply.getReplyId());
+            log.error("更新id为{}的reply失败", reply.getReplyId());
             throw new BizException("更新失败[id=" + reply.getReplyId() + "]");
         }
     }
