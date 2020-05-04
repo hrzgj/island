@@ -23,11 +23,11 @@ import org.springframework.stereotype.Service;
 public class StampServiceImpl extends ServiceImpl<StampMapper, Stamp> implements StampService {
 
     @Override
-    public Page<Stamp> listStampsByPage(int page, int pageSize, String factor) {
-        log.info("正在执行分页查询stamp: page = {} pageSize = {} factor = {}", page, pageSize, factor);
-        QueryWrapper<Stamp> queryWrapper = new QueryWrapper<Stamp>().like("", factor);
+    public Page<Stamp> listStampsByPage(int page, int pageSize, String factor, Integer userId) {
+        log.info("正在执行分页查询stamp: page = {} pageSize = {} factor = {} userId = {} ", page, pageSize, factor, userId);
+        QueryWrapper<Stamp> queryWrapper = new QueryWrapper<Stamp>().eq("user_id", userId);
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
-        Page<Stamp> result = super.page(new Page<>(page, pageSize));
+        Page<Stamp> result = super.page(new Page<>(page, pageSize), queryWrapper);
         log.info("分页查询stamp完毕: 结果数 = {} ", result.getRecords().size());
         return result;
     }

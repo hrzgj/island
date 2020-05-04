@@ -15,7 +15,7 @@ public interface StampService {
 
     /**
      * 分页查询Stamp
-     *
+     * @param userId 用户id
      * @param page     当前页数
      * @param pageSize 页的大小
      * @param factor   搜索关键词
@@ -23,7 +23,7 @@ public interface StampService {
      * @author chaos
      * @since 2020-05-04
      */
-    Page<Stamp> listStampsByPage(int page, int pageSize, String factor);
+    Page<Stamp> listStampsByPage(int page, int pageSize, String factor,Integer userId);
 
     /**
      * 根据id查询Stamp
