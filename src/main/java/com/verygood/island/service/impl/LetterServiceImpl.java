@@ -10,6 +10,8 @@ import com.verygood.island.service.LetterService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 信件 服务实现类
@@ -22,11 +24,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> implements LetterService {
 
+
     @Override
-    public Page<Letter> listLettersByPage(int page, int pageSize, String factor) {
-        log.info("正在执行分页查询letter: page = {} pageSize = {} factor = {}", page, pageSize, factor);
-        QueryWrapper<Letter> queryWrapper = new QueryWrapper<Letter>().like("", factor);
+    public Page<Letter> listLettersByPage(int page, int pageSize, Integer friendId,Integer userId) {
+        log.info("正在执行分页查询letter: page = {} pageSize = {} factor = {}", page, pageSize, friendId);
+        QueryWrapper<Letter> queryWrapper = new QueryWrapper<Letter>().like("", friendId);
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
+        queryWrapper.eq("sender_id",friendId).eq("receiver_id",userId)
+                .or().eq("receiver_id",friendId).eq("sender_id",userId);
         Page<Letter> result = super.page(new Page<>(page, pageSize));
         log.info("分页查询letter完毕: 结果数 = {} ", result.getRecords().size());
         return result;
@@ -74,6 +79,14 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
             log.error("更新id为{}的letter失败", letter.getLetterId());
             throw new BizException("更新失败[id=" + letter.getLetterId() + "]");
         }
+    }
+
+    @Override
+    public List<Letter> getOneFriendLetter(Integer senderId,Integer receiverId) {
+        //得到互送的信件
+        QueryWrapper<Letter> queryWrapper=new QueryWrapper<Letter>().eq("sender_id",senderId).eq("receiver_id",receiverId)
+                .or().eq("receiver_id",senderId).eq("sender_id",receiverId);
+        return super.list(queryWrapper);
     }
 
 }

@@ -2,8 +2,13 @@ package com.verygood.island.controller;
 
 
 import com.verygood.island.entity.Letter;
+import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.LetterService;
+import org.apache.catalina.security.SecurityUtil;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +34,12 @@ public class LetterController {
     @RequestMapping(method = RequestMethod.GET)
     public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
                                     @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-                                    @RequestParam(name = "factor", defaultValue = "") String factor) {
-        return new ResultBean<>(letterService.listLettersByPage(page, pageSize, factor));
+                                    @RequestParam(name = "friendId") Integer friendId) {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(letterService.listLettersByPage(page, pageSize, friendId,user.getUserId()));
     }
 
 
@@ -65,4 +74,23 @@ public class LetterController {
     public ResultBean<?> updateById(@RequestBody Letter letter) {
         return new ResultBean<>(letterService.updateLetter(letter));
     }
+    
+//    @RequestMapping(method = RequestMethod.GET)
+//    /**
+//     * @name 得到一名笔友的信
+//     * @param [letter]
+//     * @return
+//     * @notice none
+//     * @author cy
+//     * @date 2020/5/5
+//     */
+//    public ResultBean<?> getOneFriendLetter(@RequestParam(name = "senderId") Integer senderId){
+//        User user= (User) SecurityUtils.getSubject().getPrincipal();
+//        if(user==null){
+//            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+//        }
+//        return new ResultBean<>(letterService.getOneFriendLetter(senderId,user.getUserId()));
+//    }
+
+
 }

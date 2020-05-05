@@ -80,6 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public int updateUser(User user) {
         log.info("正在更新id为{}的user", user.getUserId());
+        user.setWord(null);
         if (super.updateById(user)) {
             log.info("更新d为{}的user成功", user.getUserId());
             return user.getUserId();

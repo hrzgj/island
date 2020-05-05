@@ -2,6 +2,9 @@ package com.verygood.island.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.Friend;
+import com.verygood.island.entity.User;
+
+import java.util.List;
 
 /**
  * <p>
@@ -23,7 +26,7 @@ public interface FriendService {
      * @author chaos
      * @since 2020-05-04
      */
-    Page<Friend> listFriendsByPage(int page, int pageSize, String factor);
+    Page<Friend> listFriendsByPage(int page, int pageSize, String factor,Integer userId);
 
     /**
      * 根据id查询Friend
@@ -64,5 +67,9 @@ public interface FriendService {
      * @since 2020-05-04
      */
     int updateFriend(Friend friend);
+
+
+
+    List<User> getUserFriend(Integer userId);
 
 }
