@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class LocationUtil {
+public class LocationUtils {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -41,7 +41,7 @@ public class LocationUtil {
     /**
      * 地理路径 api url
      */
-    public static final String DISTANCE_URL = "https://restapi.amap.com/v3/geocode/geo";
+    public static final String DISTANCE_URL = "https://restapi.amap.com/v3/distance";
 
     /**
      * 将一个地址信息转成经纬度
