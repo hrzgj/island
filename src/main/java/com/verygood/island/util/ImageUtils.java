@@ -3,8 +3,8 @@ package com.verygood.island.util;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 
 /**
@@ -24,7 +24,7 @@ public class ImageUtils {
      * @author <a href="mailto:kobe524348@gmail.com">黄钰朝</a>
      * @date 2019-08-02
      */
-    public static boolean isImage(File originFile) {
+    public static boolean isImage(InputStream originFile) {
         ImageInputStream imageInputStream = null;
         try {
             imageInputStream = ImageIO.createImageInputStream(originFile);
