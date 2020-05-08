@@ -3,6 +3,7 @@ package com.verygood.island.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -125,8 +126,8 @@ public class LocationUtils {
      * @date 2020-05-07
      */
     private Map<String, List<Map<String, String>>> getResult(String url, Map<String, String> params) {
-        log.info("正在请求外部api(connecting {})", url);
-        log.info("请求参数:{}", params);
+        String formattedUrl = formatUrlParamsByMap(url,params);
+        log.info("正在请求外部api\nconnecting... {}", formattedUrl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -137,8 +138,8 @@ public class LocationUtils {
         while (true) {
             count++;
             try {
-                response = restTemplate.exchange(url, HttpMethod.GET,
-                        new HttpEntity<String>(headers), String.class, params).getBody();
+                response = restTemplate.exchange(formattedUrl, HttpMethod.GET,
+                        new HttpEntity<String>(headers), String.class).getBody();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -161,5 +162,29 @@ public class LocationUtils {
             throw new RuntimeException("地址解析失败");
         }
         return responseObj;
+    }
+
+
+    /**
+     * 将map转换成url
+     *
+     * @param map
+     * @return 返回添加参数的url
+     */
+    public static String formatUrlParamsByMap(String url,Map<String, String> map) {
+        if (map == null) {
+            return "";
+        }
+        StringBuilder stringBuilder = new StringBuilder(url);
+        stringBuilder.append("?");
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+            stringBuilder.append("&");
+        }
+        String s = stringBuilder.toString();
+        if (s.endsWith("&")) {
+            s = StringUtils.substringBeforeLast(s, "&");
+        }
+        return s;
     }
 }
