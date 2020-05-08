@@ -38,9 +38,9 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
     UserMapper userMapper;
 
     @Override
-    public Page<Friend> listFriendsByPage(int page, int pageSize, String factor,Integer userId) {
-        log.info("正在执行分页查询friend: page = {} pageSize = {} factor = {}", page, pageSize, factor);
-        QueryWrapper<Friend> queryWrapper = new QueryWrapper<Friend>().like("", factor);
+    public Page<Friend> listFriendsByPage(int page, int pageSize,Integer userId) {
+        log.info("正在执行分页查询friend: page = {} pageSize = {} ", page, pageSize);
+        QueryWrapper<Friend> queryWrapper = new QueryWrapper<Friend>();
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
         queryWrapper.eq("user_id",userId);
         Page<Friend> result = super.page(new Page<>(page, pageSize),queryWrapper);
@@ -94,9 +94,14 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
 
     @Override
     public List<User> getUserFriend(Integer userId) {
+        log.info("正在查询用户id为{}的所有笔友",userId);
         Map<String,Object> columnMap=new HashMap<>(1);
         columnMap.put("user_id",userId);
         List<Friend> friends= friendMapper.selectByMap(columnMap);
+        if(friends.size()<=0){
+            log.info("用户id为{}的所有笔友为空",userId);
+            return null;
+        }
         QueryWrapper<User> queryWrapper=new QueryWrapper<User>();
         for(Friend friend:friends){
             queryWrapper.or().eq("user_id",friend.getFriendId());

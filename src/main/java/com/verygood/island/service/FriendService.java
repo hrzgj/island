@@ -21,12 +21,11 @@ public interface FriendService {
      *
      * @param page     当前页数
      * @param pageSize 页的大小
-     * @param factor   搜索关键词
      * @return 返回mybatis-plus的Page对象,其中records字段为符合条件的查询结果
      * @author chaos
      * @since 2020-05-04
      */
-    Page<Friend> listFriendsByPage(int page, int pageSize, String factor,Integer userId);
+    Page<Friend> listFriendsByPage(int page, int pageSize,Integer userId);
 
     /**
      * 根据id查询Friend

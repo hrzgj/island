@@ -7,6 +7,7 @@ import com.verygood.island.entity.User;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.UserService;
+import com.verygood.island.util.LocationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -81,6 +82,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public int updateUser(User user) {
         log.info("正在更新id为{}的user", user.getUserId());
         user.setWord(null);
+
         if (super.updateById(user)) {
             log.info("更新d为{}的user成功", user.getUserId());
             return user.getUserId();

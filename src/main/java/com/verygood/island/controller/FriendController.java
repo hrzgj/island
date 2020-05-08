@@ -32,13 +32,12 @@ public class FriendController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
-                                    @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-                                    @RequestParam(name = "factor", defaultValue = "") String factor) {
+                                    @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         User user= (User) SecurityUtils.getSubject().getPrincipal();
         if(user==null){
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
-        return new ResultBean<>(friendService.listFriendsByPage(page, pageSize, factor,user.getUserId()));
+        return new ResultBean<>(friendService.listFriendsByPage(page, pageSize,user.getUserId()));
     }
 
 
