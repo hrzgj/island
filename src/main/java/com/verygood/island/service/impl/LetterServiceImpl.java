@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import java.util.List;
+
 /**
  * <p>
  * 信件 服务实现类
@@ -39,12 +41,15 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
     @Autowired
     private UserMapper userMapper;
 
+
     @Override
-    public Page<Letter> listLettersByPage(int page, int pageSize, String factor) {
-        log.info("正在执行分页查询letter: page = {} pageSize = {} factor = {}", page, pageSize, factor);
-        QueryWrapper<Letter> queryWrapper = new QueryWrapper<Letter>().like("", factor);
+    public Page<Letter> listLettersByPage(int page, int pageSize, Integer friendId,Integer userId) {
+        log.info("正在执行分页查询letter: page = {} pageSize = {} friendId = {} userId = {}", page, pageSize, friendId,userId);
+        QueryWrapper<Letter> queryWrapper = new QueryWrapper<>();
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
-        Page<Letter> result = super.page(new Page<>(page, pageSize));
+        queryWrapper.eq("sender_id",friendId).eq("receiver_id",userId)
+                .or().eq("receiver_id",friendId).eq("sender_id",userId);
+        Page<Letter> result = super.page(new Page<>(page, pageSize),queryWrapper);
         log.info("分页查询letter完毕: 结果数 = {} ", result.getRecords().size());
         return result;
     }
@@ -212,5 +217,14 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         return date;
     }
 
+
+    @Override
+    public List<Letter> getOneFriendLetter(Integer friendId,Integer userId) {
+        //得到互送的信件
+        log.info("正在执行信件查询letter: friendId = {} userId = {}",friendId,userId);
+        QueryWrapper<Letter> queryWrapper=new QueryWrapper<Letter>().eq("sender_id",friendId).eq("receiver_id",userId)
+                .or().eq("receiver_id",friendId).eq("sender_id",userId);
+        return super.list(queryWrapper);
+    }
 
 }

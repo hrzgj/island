@@ -7,6 +7,7 @@ import com.verygood.island.entity.dto.ResultBean;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.LetterService;
+import org.apache.catalina.security.SecurityUtil;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +34,12 @@ public class LetterController {
     @RequestMapping(method = RequestMethod.GET)
     public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
                                     @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-                                    @RequestParam(name = "factor", defaultValue = "") String factor) {
-        return new ResultBean<>(letterService.listLettersByPage(page, pageSize, factor));
+                                    @RequestParam(name = "friendId") Integer friendId) {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(letterService.listLettersByPage(page, pageSize, friendId,user.getUserId()));
     }
 
 
@@ -79,4 +84,18 @@ public class LetterController {
         letter.setSenderId(user.getUserId());
         return new ResultBean<>(letterService.updateLetter(letter));
     }
+
+    /*
+    *不分页获得一名笔友的信件
+     */
+    @RequestMapping(method = RequestMethod.GET,value = "/all")
+    public ResultBean<?> getOneFriendLetter(@RequestParam(name = "friendId") Integer friendId){
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(letterService.getOneFriendLetter(friendId,user.getUserId()));
+    }
+
+
 }

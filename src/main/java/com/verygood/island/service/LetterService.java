@@ -3,6 +3,8 @@ package com.verygood.island.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.Letter;
 
+import java.util.List;
+
 /**
  * <p>
  * 信件 服务类
@@ -23,7 +25,7 @@ public interface LetterService {
      * @author chaos
      * @since 2020-05-04
      */
-    Page<Letter> listLettersByPage(int page, int pageSize, String factor);
+    Page<Letter> listLettersByPage(int page, int pageSize, Integer friendId,Integer userId);
 
     /**
      * 根据id查询Letter
@@ -64,5 +66,16 @@ public interface LetterService {
      * @since 2020-05-04
      */
     int updateLetter(Letter letter);
+
+
+    /**
+     * 得到一个笔友互发的信件
+     *
+     * @param letter Letter对象
+     * @return 返回信件
+     * @author cy
+     * @since 2020-05-04
+     */
+    List<Letter> getOneFriendLetter(Integer senderId,Integer receiverId);
 
 }

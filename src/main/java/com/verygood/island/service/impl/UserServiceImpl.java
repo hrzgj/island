@@ -9,11 +9,13 @@ import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.UserService;
 import com.verygood.island.util.Md5Util;
 import com.verygood.island.util.UploadUtils;
+import com.verygood.island.util.LocationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.UUID;
 
@@ -28,6 +30,10 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+
+
+    @Resource
+    LocationUtils locationUtils;
 
     /**
      * 根据id查询User
@@ -124,6 +130,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public int updateUser(User user) {
         log.info("正在更新id为{}的user", user.getUserId());
+        user.setWord(null);
+        user.setPhoto(null);
+        locationUtils.isValidLocation(user.getCity());
         if (super.updateById(user)) {
             log.info("更新d为{}的user成功", user.getUserId());
             return user.getUserId();

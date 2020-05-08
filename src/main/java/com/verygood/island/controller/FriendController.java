@@ -2,8 +2,12 @@ package com.verygood.island.controller;
 
 
 import com.verygood.island.entity.Friend;
+import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.FriendService;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,9 +32,12 @@ public class FriendController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
-                                    @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-                                    @RequestParam(name = "factor", defaultValue = "") String factor) {
-        return new ResultBean<>(friendService.listFriendsByPage(page, pageSize, factor));
+                                    @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(friendService.listFriendsByPage(page, pageSize,user.getUserId()));
     }
 
 
@@ -65,4 +72,19 @@ public class FriendController {
     public ResultBean<?> updateById(@RequestBody Friend friend) {
         return new ResultBean<>(friendService.updateFriend(friend));
     }
+
+
+
+    /*
+     *获得所有好友
+     */
+    @RequestMapping(method = RequestMethod.GET,value = "/all")
+    public ResultBean<?> getUserFriend() {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(friendService.getUserFriend(user.getUserId()));
+    }
+
 }
