@@ -3,6 +3,8 @@ package com.verygood.island.controller;
 
 import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.security.shiro.token.UserToken;
 import com.verygood.island.service.UserService;
 import org.apache.shiro.SecurityUtils;
@@ -90,6 +92,9 @@ public class UserController {
     public ResultBean<?> login(@RequestParam MultipartFile file){
         Subject subject = SecurityUtils.getSubject();
         User user = (User) subject.getPrincipal();
-        return new ResultBean<>(userService.uploadIcon(file, user));
+        if (user == null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(userService.uploadIcon(file, user.getUserId()));
     }
 }

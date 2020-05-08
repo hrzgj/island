@@ -80,11 +80,11 @@ public interface UserService {
     /**
      * 上传用户头像
      * @param file 头像文件
-     * @param user 用户信息
+     * @param userId 用户Id信息
      * @return : java.lang.String
      * @author : huange7
      * @date : 2020-05-07 19:52
      */
-    String uploadIcon(MultipartFile file, User user);
+    String uploadIcon(MultipartFile file, Integer userId);
 
 }

@@ -134,7 +134,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public String uploadIcon(MultipartFile file, User user) {
+    public String uploadIcon(MultipartFile file, Integer userId) {
 
         log.info("正在执行上传用户头像操作");
         if (file == null){
@@ -145,7 +145,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         File result = UploadUtils.upload(file, UploadUtils.getFileName(file.getOriginalFilename()));
 
         // 进行数据库的更新
-        User userPo = getOne(new QueryWrapper<User>().eq("user_id", user.getUserId()));
+        User userPo = getOne(new QueryWrapper<User>().eq("user_id", userId));
 
         // 设置图片地址
         userPo.setPhoto(result.getName());
