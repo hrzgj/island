@@ -56,6 +56,11 @@ public class LetterController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Letter letter) {
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (null == user) {
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        letter.setSenderId(user.getUserId());
         return new ResultBean<>(letterService.insertLetter(letter));
     }
 
@@ -72,6 +77,11 @@ public class LetterController {
      */
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody Letter letter) {
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (null == user) {
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        letter.setSenderId(user.getUserId());
         return new ResultBean<>(letterService.updateLetter(letter));
     }
 

@@ -3,6 +3,7 @@ package com.verygood.island.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.verygood.island.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 /**
 * <p>
@@ -13,6 +14,7 @@ import org.apache.ibatis.annotations.Mapper;
 * @since 2020-05-02
 */
 @Mapper
+@Repository
 public interface UserMapper extends BaseMapper<User> {
 
 }
