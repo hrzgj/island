@@ -7,6 +7,7 @@ import com.verygood.island.entity.User;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.UserService;
+import com.verygood.island.util.ImageUtils;
 import com.verygood.island.util.Md5Util;
 import com.verygood.island.util.UploadUtils;
 import com.verygood.island.util.LocationUtils;
@@ -17,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.UUID;
+import java.io.IOException;
 
 /**
  * <p>
@@ -146,10 +147,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public String uploadIcon(MultipartFile file, Integer userId) {
 
         log.info("正在执行上传用户头像操作");
-        if (file == null){
+        if (file == null || file.getSize() == 0){
             log.info("上传的文件为空！");
             throw new BizException("请选择正确的文件！");
         }
+
+        // 对上传的文件进行判断
+        boolean isImage = false;
+        try {
+            isImage = ImageUtils.isImage(file.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (!isImage){
+            log.info("用户上传的文件不是图片：【{}】", file.getOriginalFilename());
+            throw new BizException("上传头像失败！该文件非图片类型");
+        }
+
         log.info("上传的文件名称：【{}】", file.getOriginalFilename());
         File result = UploadUtils.upload(file, UploadUtils.getFileName(file.getOriginalFilename()));
 
