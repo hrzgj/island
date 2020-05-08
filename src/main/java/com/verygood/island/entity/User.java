@@ -70,6 +70,11 @@ public class User extends Model<User> {
      */
     private String background;
 
+    /**
+     * 所在城市
+     */
+    private String city;
+
 
     @Override
     protected Serializable pkVal() {
