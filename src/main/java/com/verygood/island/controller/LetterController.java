@@ -2,8 +2,12 @@ package com.verygood.island.controller;
 
 
 import com.verygood.island.entity.Letter;
+import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.LetterService;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +51,11 @@ public class LetterController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Letter letter) {
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (null == user) {
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        letter.setSenderId(user.getUserId());
         return new ResultBean<>(letterService.insertLetter(letter));
     }
 
@@ -63,6 +72,11 @@ public class LetterController {
      */
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody Letter letter) {
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (null == user) {
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        letter.setSenderId(user.getUserId());
         return new ResultBean<>(letterService.updateLetter(letter));
     }
 }
