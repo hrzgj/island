@@ -3,9 +3,14 @@ package com.verygood.island.controller;
 
 import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.security.shiro.token.UserToken;
 import com.verygood.island.service.UserService;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * <p>
@@ -64,5 +69,27 @@ public class UserController {
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody User user) {
         return new ResultBean<>(userService.updateUser(user));
+    }
+
+    /**
+     * 登录
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/login")
+    public ResultBean<?> login(@RequestBody User user, HttpServletResponse response){
+        Subject subject = SecurityUtils.getSubject();
+        subject.login(new UserToken(user.getUsername(), user.getPassword()));
+        user = (User) subject.getPrincipal();
+        response.setHeader("Authorization", subject.getSession().getId().toString());
+        return new ResultBean<>(user);
+    }
+
+    /**
+     * 上传头像
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/upload")
+    public ResultBean<?> login(@RequestParam MultipartFile file){
+        Subject subject = SecurityUtils.getSubject();
+        User user = (User) subject.getPrincipal();
+        return new ResultBean<>(userService.uploadIcon(file, user));
     }
 }

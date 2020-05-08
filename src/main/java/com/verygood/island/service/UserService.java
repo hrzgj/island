@@ -2,6 +2,7 @@ package com.verygood.island.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -75,5 +76,15 @@ public interface UserService {
      * @since 2020-05-04
      */
     int updateUser(User user);
+
+    /**
+     * 上传用户头像
+     * @param file 头像文件
+     * @param user 用户信息
+     * @return : java.lang.String
+     * @author : huange7
+     * @date : 2020-05-07 19:52
+     */
+    String uploadIcon(MultipartFile file, User user);
 
 }
