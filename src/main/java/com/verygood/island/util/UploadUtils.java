@@ -1,10 +1,12 @@
 package com.verygood.island.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * 用于上传文件到服务器
@@ -47,4 +49,21 @@ public class UploadUtils {
         throw new RuntimeException("上传失败");
 
     }
+
+    /**
+     * 获取服务器端的图片名称
+     * @param originName 图片原始名称
+     * @return : java.lang.String
+     * @author : huange7
+     * @date : 2020-05-07 20:28
+     */
+    public static String getFileName(String originName){
+        if (StringUtils.isEmpty(originName)){
+            return UUID.randomUUID().toString();
+        }
+        int index = originName.lastIndexOf(".");
+        String suffix = originName.substring(index == -1 ? 0 : index);
+        return UUID.randomUUID().toString() + suffix;
+    }
+
 }
