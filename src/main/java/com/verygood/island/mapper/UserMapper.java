@@ -5,6 +5,8 @@ import com.verygood.island.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
+
 /**
 * <p>
 * 用户 Mapper 接口
