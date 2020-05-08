@@ -50,15 +50,31 @@ public class UploadUtils {
 
     }
 
+
+    /**
+     * 删除上传的文件
+     *
+     * @param fileName 文件名
+     */
+    public static void deleteFile(String fileName) {
+        File file = new File(PATH + "/" + fileName);
+        if (file.exists()) {
+            file.delete();
+        } else {
+            throw new RuntimeException("文件不存在，无法删除");
+        }
+    }
+
     /**
      * 获取服务器端的图片名称
+     *
      * @param originName 图片原始名称
      * @return : java.lang.String
      * @author : huange7
      * @date : 2020-05-07 20:28
      */
-    public static String getFileName(String originName){
-        if (StringUtils.isEmpty(originName)){
+    public static String getFileName(String originName) {
+        if (StringUtils.isEmpty(originName)) {
             return UUID.randomUUID().toString();
         }
         int index = originName.lastIndexOf(".");
