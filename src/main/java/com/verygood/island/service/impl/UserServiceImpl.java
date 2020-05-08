@@ -171,6 +171,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 进行数据库的更新
         User userPo = getOne(new QueryWrapper<User>().eq("user_id", userId));
 
+        // 删除旧的头像地址
+        if (!StringUtils.isEmpty(userPo.getPhoto())){
+            UploadUtils.deleteFile(userPo.getPhoto());
+        }
+
         // 设置图片地址
         userPo.setPhoto(result.getName());
 
