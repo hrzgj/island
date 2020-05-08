@@ -68,7 +68,9 @@ public interface FriendService {
     int updateFriend(Friend friend);
 
 
-
-    List<User> getUserFriend(Integer userId);
+    /*
+     *不分页查询friend
+     */
+    List<Friend>getUserFriend(Integer userId);
 
 }

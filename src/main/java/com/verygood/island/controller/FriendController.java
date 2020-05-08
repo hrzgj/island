@@ -75,16 +75,10 @@ public class FriendController {
 
 
 
-
-    @RequestMapping(method = RequestMethod.GET,value = "/all")
-    /**
-     * @name getUserFriend
-     * @param []
-     * @return
-     * @notice none
-     * @author cy
-     * @date 2020/5/5
+    /*
+     *获得所有好友
      */
+    @RequestMapping(method = RequestMethod.GET,value = "/all")
     public ResultBean<?> getUserFriend() {
         User user= (User) SecurityUtils.getSubject().getPrincipal();
         if(user==null){

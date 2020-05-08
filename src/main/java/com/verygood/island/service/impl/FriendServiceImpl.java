@@ -93,7 +93,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
     }
 
     @Override
-    public List<User> getUserFriend(Integer userId) {
+    public List<Friend> getUserFriend(Integer userId) {
         log.info("正在查询用户id为{}的所有笔友",userId);
         Map<String,Object> columnMap=new HashMap<>(1);
         columnMap.put("user_id",userId);
@@ -102,11 +102,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
             log.info("用户id为{}的所有笔友为空",userId);
             return null;
         }
-        QueryWrapper<User> queryWrapper=new QueryWrapper<User>();
-        for(Friend friend:friends){
-            queryWrapper.or().eq("user_id",friend.getFriendId());
-        }
-        return userMapper.selectList(queryWrapper);
+        return friends;
     }
 
 

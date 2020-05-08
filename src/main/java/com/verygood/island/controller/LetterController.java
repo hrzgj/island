@@ -74,23 +74,18 @@ public class LetterController {
     public ResultBean<?> updateById(@RequestBody Letter letter) {
         return new ResultBean<>(letterService.updateLetter(letter));
     }
-    
-//    @RequestMapping(method = RequestMethod.GET)
-//    /**
-//     * @name 得到一名笔友的信
-//     * @param [letter]
-//     * @return
-//     * @notice none
-//     * @author cy
-//     * @date 2020/5/5
-//     */
-//    public ResultBean<?> getOneFriendLetter(@RequestParam(name = "senderId") Integer senderId){
-//        User user= (User) SecurityUtils.getSubject().getPrincipal();
-//        if(user==null){
-//            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
-//        }
-//        return new ResultBean<>(letterService.getOneFriendLetter(senderId,user.getUserId()));
-//    }
+
+    /*
+    *不分页获得一名笔友的信件
+     */
+    @RequestMapping(method = RequestMethod.GET,value = "/all")
+    public ResultBean<?> getOneFriendLetter(@RequestParam(name = "friendId") Integer friendId){
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(letterService.getOneFriendLetter(friendId,user.getUserId()));
+    }
 
 
 }
