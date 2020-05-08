@@ -70,11 +70,11 @@ public class UserController {
      */
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody User user) {
-        User user1= (User) SecurityUtils.getSubject().getPrincipal();
-        if(user1==null){
+        User principal= (User) SecurityUtils.getSubject().getPrincipal();
+        if(principal==null){
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
-        user.setUserId(user1.getUserId());
+        user.setUserId(principal.getUserId());
         return new ResultBean<>(userService.updateUser(user));
     }
 
