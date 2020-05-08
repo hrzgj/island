@@ -1,7 +1,7 @@
 package com.verygood.island.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.injector.methods.SelectByMap;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.entity.Friend;
@@ -11,13 +11,10 @@ import com.verygood.island.mapper.FriendMapper;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.FriendService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.convert.EntityWriter;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -32,20 +29,35 @@ import java.util.Map;
 public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> implements FriendService {
 
     @Resource
-    FriendMapper friendMapper;
+    private FriendMapper friendMapper;
 
     @Resource
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Override
-    public Page<Friend> listFriendsByPage(int page, int pageSize,Integer userId) {
+    public Page<User> listFriendsByPage(int page, int pageSize,Integer userId) {
         log.info("正在执行分页查询friend: page = {} pageSize = {} ", page, pageSize);
-        QueryWrapper<Friend> queryWrapper = new QueryWrapper<Friend>();
+        QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
         queryWrapper.eq("user_id",userId);
         Page<Friend> result = super.page(new Page<>(page, pageSize),queryWrapper);
+        if(result==null){
+            log.info("该userId={}没有笔友",userId);
+            return null;
+        }
+        List<User> users=new ArrayList<>(result.getRecords().size());
+        log.info("userId{}笔友数量{}",userId,result.getRecords().size());
+        for(Friend friend:result.getRecords()){
+            QueryWrapper<User> userQueryWrapper=new QueryWrapper<User>().eq("user_id",friend.getFriendId());
+            User user=userMapper.selectOne(userQueryWrapper);
+            user.setPassword(null);
+            users.add(user);
+        }
         log.info("分页查询friend完毕: 结果数 = {} ", result.getRecords().size());
-        return result;
+        Page<User> userPage= new Page<>();
+        BeanUtil.copyProperties(result,userPage);
+        userPage.setRecords(users);
+        return userPage;
     }
 
     @Override
@@ -101,6 +113,14 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
         if(friends.size()<=0){
             log.info("用户id为{}的所有笔友为空",userId);
             return null;
+        }
+        List<User> users=new ArrayList<>(friends.size());
+        log.info("userId{}笔友数量{}",userId,friends.size());
+        for(Friend friend:friends){
+            QueryWrapper<User> userQueryWrapper=new QueryWrapper<User>().eq("user_id",friend.getFriendId());
+            User user=userMapper.selectOne(userQueryWrapper);
+            user.setPassword(null);
+            users.add(user);
         }
         return friends;
     }
