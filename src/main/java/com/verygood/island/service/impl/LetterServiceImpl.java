@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.entity.Letter;
+import com.verygood.island.entity.Notice;
 import com.verygood.island.entity.User;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.LetterMapper;
+import com.verygood.island.mapper.NoticeMapper;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.LetterService;
 import com.verygood.island.util.LocationUtils;
@@ -17,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-
 import java.util.List;
 
 /**
@@ -41,15 +42,18 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private NoticeMapper noticeMapper;
+
 
     @Override
-    public Page<Letter> listLettersByPage(int page, int pageSize, Integer friendId,Integer userId) {
-        log.info("正在执行分页查询letter: page = {} pageSize = {} friendId = {} userId = {}", page, pageSize, friendId,userId);
+    public Page<Letter> listLettersByPage(int page, int pageSize, Integer friendId, Integer userId) {
+        log.info("正在执行分页查询letter: page = {} pageSize = {} friendId = {} userId = {}", page, pageSize, friendId, userId);
         QueryWrapper<Letter> queryWrapper = new QueryWrapper<>();
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
-        queryWrapper.eq("sender_id",friendId).eq("receiver_id",userId)
-                .or().eq("receiver_id",friendId).eq("sender_id",userId);
-        Page<Letter> result = super.page(new Page<>(page, pageSize),queryWrapper);
+        queryWrapper.eq("sender_id", friendId).eq("receiver_id", userId)
+                .or().eq("receiver_id", friendId).eq("sender_id", userId);
+        Page<Letter> result = super.page(new Page<>(page, pageSize), queryWrapper);
         log.info("分页查询letter完毕: 结果数 = {} ", result.getRecords().size());
         return result;
     }
@@ -111,13 +115,13 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         log.info("正在更新id为{}的letter", letter.getLetterId());
         Letter letterPo = getById(letter.getLetterId());
         //判空
-        if(letterPo==null){
-            log.warn("id为{}的信件不存在，无法更新",letter.getLetterId());
+        if (letterPo == null) {
+            log.warn("id为{}的信件不存在，无法更新", letter.getLetterId());
             throw new BizException("信件不存在，无法更新");
         }
         //已发出信件不允许修改
-        if(letterPo.getIsSend()){
-            log.warn("id为{}的信件已发出，无法更新",letter.getLetterId());
+        if (letterPo.getIsSend()) {
+            log.warn("id为{}的信件已发出，无法更新", letter.getLetterId());
             throw new BizException("信件已发出，无法更新");
         }
 
@@ -149,7 +153,7 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         log.info("正在创建发信任务");
         User sender = userMapper.selectById(letter.getSenderId());
         User receiver = userMapper.selectById(letter.getReceiverId());
-        if(sender==null||receiver==null){
+        if (sender == null || receiver == null) {
             log.error("缺少寄件人或收件人，无法发信");
             throw new BizException("发信失败，缺少寄件人或收件人");
         }
@@ -159,7 +163,7 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         }
         long distance = locationUtils.getDistance(sender.getCity(), receiver.getCity());
         log.info("计算出两者的距离为：{}米", distance);
-        taskScheduler.schedule(new LetterSendingTask(letter), calculateDuration(distance));
+        taskScheduler.schedule(new LetterSendingTask(letter, sender), calculateDuration(distance));
     }
 
     /**
@@ -175,8 +179,14 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
          */
         private final Letter letter;
 
-        public LetterSendingTask(Letter letter) {
+        /**
+         * 写信人
+         */
+        private final User sender;
+
+        public LetterSendingTask(Letter letter, User sender) {
             this.letter = letter;
+            this.sender = sender;
         }
 
         @Override
@@ -184,6 +194,14 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
             letter.setReceiveTime(LocalDateTime.now());
             if (updateById(letter)) {
                 log.info("发送id为{}的letter成功，接收时间：{}", letter.getLetterId(), letter.getReceiveTime());
+                //发送通知
+                Notice notice = new Notice();
+                notice.setTitle("收信通知");
+                String content = "你收到一封来自" + sender.getNickname() + "的信件，快去查收吧！";
+                notice.setContent(content);
+                notice.setUserId(letter.getReceiverId());
+                noticeMapper.insert(notice);
+                log.info("发送notice成功，内容为{}", content);
             } else {
                 log.error("发送id为{}的letter失败", letter.getLetterId());
                 throw new BizException("发送失败[id=" + letter.getLetterId() + "]");
@@ -219,11 +237,11 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
 
     @Override
-    public List<Letter> getOneFriendLetter(Integer friendId,Integer userId) {
+    public List<Letter> getOneFriendLetter(Integer friendId, Integer userId) {
         //得到互送的信件
-        log.info("正在执行信件查询letter: friendId = {} userId = {}",friendId,userId);
-        QueryWrapper<Letter> queryWrapper=new QueryWrapper<Letter>().eq("sender_id",friendId).eq("receiver_id",userId)
-                .or().eq("receiver_id",friendId).eq("sender_id",userId);
+        log.info("正在执行信件查询letter: friendId = {} userId = {}", friendId, userId);
+        QueryWrapper<Letter> queryWrapper = new QueryWrapper<Letter>().eq("sender_id", friendId).eq("receiver_id", userId)
+                .or().eq("receiver_id", friendId).eq("sender_id", userId);
         return super.list(queryWrapper);
     }
 
