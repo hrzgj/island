@@ -10,6 +10,8 @@ import com.verygood.island.service.NoticeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 通知 服务实现类
@@ -23,13 +25,13 @@ import org.springframework.stereotype.Service;
 public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> implements NoticeService {
 
     @Override
-    public Page<Notice> listNoticesByPage(int page, int pageSize, String factor) {
-        log.info("正在执行分页查询notice: page = {} pageSize = {} factor = {}", page, pageSize, factor);
-        QueryWrapper<Notice> queryWrapper = new QueryWrapper<Notice>().like("", factor);
+    public List<Notice> listNoticesByPage(Integer userId){
+        log.info("正在返回userId={}的通知",userId);
+        QueryWrapper<Notice> queryWrapper = new QueryWrapper<Notice>().eq("user_id",userId).eq("is_read",0);
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
-        Page<Notice> result = super.page(new Page<>(page, pageSize));
-        log.info("分页查询notice完毕: 结果数 = {} ", result.getRecords().size());
-        return result;
+        List<Notice> notices=super.list(queryWrapper);
+        log.info("返回通知数量{}",notices.size());
+        return notices;
     }
 
     @Override

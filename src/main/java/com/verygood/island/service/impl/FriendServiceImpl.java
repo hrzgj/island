@@ -48,7 +48,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
         List<User> users=new ArrayList<>(result.getRecords().size());
         log.info("userId{}笔友数量{}",userId,result.getRecords().size());
         for(Friend friend:result.getRecords()){
-            QueryWrapper<User> userQueryWrapper=new QueryWrapper<User>().eq("user_id",friend.getFriendId());
+            QueryWrapper<User> userQueryWrapper=new QueryWrapper<User>().eq("user_id",friend.getFriendUserId());
             User user=userMapper.selectOne(userQueryWrapper);
             user.setPassword(null);
             users.add(user);
@@ -105,7 +105,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
     }
 
     @Override
-    public List<Friend> getUserFriend(Integer userId) {
+    public List<User> getUserFriend(Integer userId) {
         log.info("正在查询用户id为{}的所有笔友",userId);
         Map<String,Object> columnMap=new HashMap<>(1);
         columnMap.put("user_id",userId);
@@ -117,12 +117,12 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
         List<User> users=new ArrayList<>(friends.size());
         log.info("userId{}笔友数量{}",userId,friends.size());
         for(Friend friend:friends){
-            QueryWrapper<User> userQueryWrapper=new QueryWrapper<User>().eq("user_id",friend.getFriendId());
+            QueryWrapper<User> userQueryWrapper=new QueryWrapper<User>().eq("user_id",friend.getFriendUserId());
             User user=userMapper.selectOne(userQueryWrapper);
             user.setPassword(null);
             users.add(user);
         }
-        return friends;
+        return users;
     }
 
 
