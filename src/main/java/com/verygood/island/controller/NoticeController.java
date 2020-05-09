@@ -2,8 +2,12 @@ package com.verygood.island.controller;
 
 
 import com.verygood.island.entity.Notice;
+import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.NoticeService;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,10 +31,12 @@ public class NoticeController {
      * 查询分页数据
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
-                                    @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-                                    @RequestParam(name = "factor", defaultValue = "") String factor) {
-        return new ResultBean<>(noticeService.listNoticesByPage(page, pageSize, factor));
+    public ResultBean<?> listByPage() {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(noticeService.listNoticesByPage(user.getUserId()));
     }
 
 
