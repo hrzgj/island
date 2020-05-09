@@ -72,6 +72,9 @@ public class NoticeController {
         return new ResultBean<>(noticeService.updateNotice(notice));
     }
 
+    /**
+     *  更改消息读状态
+     */
     @RequestMapping(method = RequestMethod.PUT, value = "/read/{id}")
     public ResultBean<?> readById(@PathVariable("id") Integer id){
         User user = (User)SecurityUtils.getSubject().getPrincipal();
