@@ -3,6 +3,8 @@ package com.verygood.island.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.Notice;
 
+import java.util.List;
+
 /**
  * <p>
  * 通知 服务类
@@ -16,14 +18,11 @@ public interface NoticeService {
     /**
      * 分页查询Notice
      *
-     * @param page     当前页数
-     * @param pageSize 页的大小
-     * @param factor   搜索关键词
      * @return 返回mybatis-plus的Page对象,其中records字段为符合条件的查询结果
      * @author chaos
      * @since 2020-05-04
      */
-    Page<Notice> listNoticesByPage(int page, int pageSize, String factor);
+    List<Notice> listNoticesByPage(Integer userId);
 
     /**
      * 根据id查询Notice
