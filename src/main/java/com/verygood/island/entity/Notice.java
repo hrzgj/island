@@ -31,6 +31,11 @@ public class Notice extends Model<Notice> {
     private Integer noticeId;
 
     /**
+     * 用户id
+     */
+    private Integer userId;
+
+    /**
      * 是否已读
      */
     private Boolean isRead;
@@ -39,6 +44,11 @@ public class Notice extends Model<Notice> {
      * 通知内容
      */
     private String content;
+
+    /**
+     * 通知标题
+     */
+    private String title;
 
 
     @Override
