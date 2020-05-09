@@ -71,6 +71,6 @@ public interface FriendService {
     /*
      *不分页查询friend
      */
-    List<Friend>getUserFriend(Integer userId);
+    List<User>getUserFriend(Integer userId);
 
 }
