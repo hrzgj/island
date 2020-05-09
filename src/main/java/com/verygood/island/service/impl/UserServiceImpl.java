@@ -3,9 +3,12 @@ package com.verygood.island.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.verygood.island.constant.Constants;
+import com.verygood.island.entity.Stamp;
 import com.verygood.island.entity.User;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.UserMapper;
+import com.verygood.island.service.StampService;
 import com.verygood.island.service.UserService;
 import com.verygood.island.util.ImageUtils;
 import com.verygood.island.util.Md5Util;
@@ -35,6 +38,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     LocationUtils locationUtils;
+
+    @Resource
+    StampService stampService;
+
+    /**
+     * 用户名的正则表达式：4-16位的字母数字组合（可包含其中一种）
+     */
+    private final String NAME_PATTERN = "^[a-zA-Z0-9]{4,16}$";
+
+    /**
+     * 密码的正则表达式：6-16位的字母数字组合（必须包含字母，数字）
+     */
+    private final String PASSWORD_PATTERN = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
 
     /**
      * 根据id查询User
@@ -97,6 +113,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BizException("账号或者密码不能为空");
         }
 
+        // 查看账户格式是否正确
+        if (!user.getUsername().matches(NAME_PATTERN)){
+            log.info("用户进行注册时未传输正确的用户名格式：【{}】", user.getUsername());
+            throw new BizException("用户名格式错误！应为：4-16位的字母数字组合");
+        }
+
+        if (!user.getPassword().matches(PASSWORD_PATTERN)){
+            log.info("用户进行注册时未传输正确的密码格式：【{}】", user.getPassword());
+            throw new BizException("密码格式错误！应为：6-16位的字母数字组合");
+        }
+
         // 查看该用户是否已经存在
         if (super.getOne(new QueryWrapper<User>().eq("username", user.getUsername())) != null){
             log.info("插入数据时检测到账号【{}】已经存在！插入失败", user.getUsername());
@@ -109,11 +136,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 进行插库操作
         if (super.save(user)) {
             log.info("插入user成功,id为{}", user.getUserId());
-            return user.getUserId();
         } else {
             log.error("插入user失败");
             throw new BizException("添加失败");
         }
+
+        // 进行邮票的增加,初始化送 5 张 “中国” 类型邮票
+        for (int i = 0; i < Constants.INIT_STAMP_NUMBER; i++){
+            Stamp stamp = new Stamp();
+            stamp.setStampName(Constants.STAMP_CHINA);
+            stamp.setUserId(user.getUserId());
+            stampService.insertStamp(stamp);
+        }
+
+        return user.getUserId();
     }
 
     @Override
