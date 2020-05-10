@@ -64,4 +64,14 @@ public interface NoticeService {
      */
     int updateNotice(Notice notice);
 
+    /**
+     * 根据用户id和消息id更新消息的读状态
+     * @param userId 用户id
+     * @param noticeId 消息id
+     * @return : int
+     * @author : huange7
+     * @date : 2020-05-10 0:29
+     */
+    int readNoticeById(Integer userId, Integer noticeId);
+
 }

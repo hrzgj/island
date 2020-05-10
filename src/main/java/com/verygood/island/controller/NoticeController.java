@@ -71,4 +71,16 @@ public class NoticeController {
     public ResultBean<?> updateById(@RequestBody Notice notice) {
         return new ResultBean<>(noticeService.updateNotice(notice));
     }
+
+    /**
+     *  更改消息读状态
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = "/read/{id}")
+    public ResultBean<?> readById(@PathVariable("id") Integer id){
+        User user = (User)SecurityUtils.getSubject().getPrincipal();
+        if (user == null){
+            return new ResultBean<>(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(noticeService.readNoticeById(user.getUserId(), id));
+    }
 }
