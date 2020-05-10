@@ -173,9 +173,15 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         log.info("计算出两者的距离为：{}米", distance);
 
         //消耗邮票
-        if (letter.getSenderId() == null || stampMapper.selectById(letter.getSenderId()) == null) {
-            log.warn("id为{}的信件没有使用有效邮票，无法发信", letter.getLetterId());
-            throw new BizException("发信失败，缺少有效的邮票");
+        if (letter.getSenderId() != null) {
+            Stamp stamp = stampMapper.selectById(letter.getSenderId());
+            if (stamp == null || !stamp.getUserId().equals(sender.getUserId())) {
+                log.warn("id为{}的信件没有使用有效邮票，无法发信", letter.getLetterId());
+                throw new BizException("发信失败，缺少有效的邮票");
+            }
+        } else {
+            log.warn("id为{}的信件没有使用邮票", letter.getLetterId());
+            throw new BizException("请选择一张邮票进行发信!");
         }
 
         Stamp stamp = new Stamp();
