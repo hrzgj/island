@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.entity.Letter;
 import com.verygood.island.entity.Notice;
+import com.verygood.island.entity.Stamp;
 import com.verygood.island.entity.User;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.LetterMapper;
 import com.verygood.island.mapper.NoticeMapper;
+import com.verygood.island.mapper.StampMapper;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.LetterService;
 import com.verygood.island.util.LocationUtils;
@@ -44,6 +46,9 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
     @Autowired
     private NoticeMapper noticeMapper;
+
+    @Autowired
+    private StampMapper stampMapper;
 
 
     @Override
@@ -151,6 +156,9 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
      */
     private void scheduleLetterSending(Letter letter) {
         log.info("正在创建发信任务");
+
+
+        //计算收信时间
         User sender = userMapper.selectById(letter.getSenderId());
         User receiver = userMapper.selectById(letter.getReceiverId());
         if (sender == null || receiver == null) {
@@ -163,6 +171,21 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         }
         long distance = locationUtils.getDistance(sender.getCity(), receiver.getCity());
         log.info("计算出两者的距离为：{}米", distance);
+
+        //消耗邮票
+        if (letter.getSenderId() == null || stampMapper.selectById(letter.getSenderId()) == null) {
+            log.warn("id为{}的信件没有使用有效邮票，无法发信", letter.getLetterId());
+            throw new BizException("发信失败，缺少有效的邮票");
+        }
+
+        Stamp stamp = new Stamp();
+        stamp.setStampId(letter.getStampId());
+        //设置为null,既不属于发信人也不属于收信人
+        stamp.setUserId(null);
+        stampMapper.updateById(stamp);
+
+        //启动定时任务
+        log.info("正在启动定时任务");
         taskScheduler.schedule(new LetterSendingTask(letter, sender), calculateDuration(distance));
     }
 
@@ -191,21 +214,43 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
         @Override
         public void run() {
+            //消耗邮票
+            this.useStamp();
+
+            //发送信件
             letter.setReceiveTime(LocalDateTime.now());
             if (updateById(letter)) {
                 log.info("发送id为{}的letter成功，接收时间：{}", letter.getLetterId(), letter.getReceiveTime());
                 //发送通知
-                Notice notice = new Notice();
-                notice.setTitle("收信通知");
-                String content = "你收到一封来自" + sender.getNickname() + "的信件，快去查收吧！";
-                notice.setContent(content);
-                notice.setUserId(letter.getReceiverId());
-                noticeMapper.insert(notice);
-                log.info("发送notice成功，内容为{}", content);
+                this.sendNotice();
             } else {
                 log.error("发送id为{}的letter失败", letter.getLetterId());
                 throw new BizException("发送失败[id=" + letter.getLetterId() + "]");
             }
+        }
+
+        /**
+         * 使用邮票
+         */
+        private void useStamp() {
+            Stamp stamp = new Stamp();
+            stamp.setStampId(letter.getStampId());
+            stamp.setUserId(letter.getReceiverId());
+            stampMapper.updateById(stamp);
+            log.info("使用id为{}的邮票成功", stamp.getStampId());
+        }
+
+        /**
+         * 发送通知
+         */
+        private void sendNotice() {
+            Notice notice = new Notice();
+            notice.setTitle("收信通知");
+            String content = "你收到一封来自" + sender.getNickname() + "的信件，快去查收吧！";
+            notice.setContent(content);
+            notice.setUserId(letter.getReceiverId());
+            noticeMapper.insert(notice);
+            log.info("发送notice成功，内容为{}", content);
         }
     }
 
@@ -226,12 +271,12 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         int hour = (int) (distance / milePerHour);
         Date date = new Date();
         if (hour == 0) {
-            //最少需要5分钟
-            date.setMinutes(date.getMinutes() + 5);
+            //最少需要1分钟
+            date.setMinutes(date.getMinutes() + 1);
         } else {
             date.setHours(date.getHours() + hour);
         }
-        log.info("计算出预计收信时间: {}", date);
+        log.info("预计收信时间: {}", date);
         return date;
     }
 
