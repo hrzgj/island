@@ -1,6 +1,7 @@
 package com.verygood.island.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.entity.Letter;
@@ -174,7 +175,7 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
         //消耗邮票
         if (letter.getSenderId() != null) {
-            Stamp stamp = stampMapper.selectById(letter.getSenderId());
+            Stamp stamp = stampMapper.selectById(letter.getStampId());
             if (stamp == null || !stamp.getUserId().equals(sender.getUserId())) {
                 log.warn("id为{}的信件没有使用有效邮票，无法发信", letter.getLetterId());
                 throw new BizException("发信失败，缺少有效的邮票");
@@ -184,11 +185,12 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
             throw new BizException("请选择一张邮票进行发信!");
         }
 
-        Stamp stamp = new Stamp();
-        stamp.setStampId(letter.getStampId());
-        //设置为null,既不属于发信人也不属于收信人
-        stamp.setUserId(null);
-        stampMapper.updateById(stamp);
+
+        UpdateWrapper<Stamp> stampUpdateWrapper = new UpdateWrapper<>();
+        stampUpdateWrapper.eq("stamp_id", letter.getStampId())
+                //设置为null,既不属于发信人也不属于收信人
+                .set("user_id", null);
+        stampMapper.update(new Stamp(), stampUpdateWrapper);
 
         //启动定时任务
         log.info("正在启动定时任务");
