@@ -78,4 +78,13 @@ public interface LetterService {
      */
     List<Letter> getOneFriendLetter(Integer senderId,Integer receiverId);
 
+    /**
+     * 获取用户的草稿列表
+     * @param userId 用户id
+     * @return : java.util.List<com.verygood.island.entity.Letter>
+     * @author : huange7
+     * @date : 2020-05-14 21:01
+     */
+    List<Letter> getLetterDraft(Integer userId);
+
 }
