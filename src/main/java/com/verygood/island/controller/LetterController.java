@@ -85,7 +85,7 @@ public class LetterController {
         return new ResultBean<>(letterService.updateLetter(letter));
     }
 
-    /*
+    /**
     *不分页获得一名笔友的信件
      */
     @RequestMapping(method = RequestMethod.GET,value = "/all")
