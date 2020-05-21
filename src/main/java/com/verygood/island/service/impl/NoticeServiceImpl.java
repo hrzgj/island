@@ -78,4 +78,36 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
         }
     }
 
+    @Override
+    public int readNoticeById(Integer userId, Integer noticeId) {
+        log.info("正在更新id为{}的notice的读取状态", noticeId);
+        if (noticeId == null){
+            log.info("id为空，无法进行更新读状态");
+            throw new BizException("更新消息状态失败！请校验参数");
+        }
+
+        // 查询对应的notice记录
+        Notice notice = getById(noticeId);
+
+        if (notice == null){
+            log.info("查询id为【{}】的notice，notice不存在！", noticeId);
+            throw new BizException("更新消息状态失败！不存在该消息");
+        }
+
+        // 设置为已读状态
+        if (notice.getIsRead()){
+            log.info("更新id为【{}】的notice读状态失败！已经被读", noticeId);
+            throw new BizException("该条消息已经被读，不可重复读取");
+        }
+
+        notice.setIsRead(Boolean.TRUE);
+        // 执行更新操作
+        if (super.updateById(notice)) {
+            log.info("更新d为{}的notice成功", notice.getNoticeId());
+            return notice.getNoticeId();
+        } else {
+            log.error("更新id为{}的notice失败", notice.getNoticeId());
+            throw new BizException("更新失败[id=" + notice.getNoticeId() + "]");
+        }
+    }
 }

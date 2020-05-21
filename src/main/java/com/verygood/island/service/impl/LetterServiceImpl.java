@@ -303,4 +303,18 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         return super.list(queryWrapper);
     }
 
+    /**
+     *  查询草稿箱列表
+     * @param userId 用户id
+     * @return : java.util.List<com.verygood.island.entity.Letter>
+     * @author : huange7
+     * @date : 2020-05-14 21:12
+     */
+    @Override
+    public List<Letter> getLetterDraft(Integer userId) {
+        log.info("开始执行查询用户【{}】的草稿列表：", userId);
+        return super.list(new QueryWrapper<Letter>().eq("sender_id", userId)
+                .eq("is_send", false));
+
+    }
 }

@@ -98,4 +98,16 @@ public class LetterController {
     }
 
 
+    /**
+     * 查询草稿箱列表
+     */
+    @RequestMapping(method = RequestMethod.GET,value = "/draft")
+    public ResultBean<?> getLetterDraft(){
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(letterService.getLetterDraft(user.getUserId()));
+    }
+
 }
