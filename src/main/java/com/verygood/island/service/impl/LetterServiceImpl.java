@@ -78,6 +78,11 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         //不允许输入信件接收时间
         letter.setReceiveTime(null);
 
+        if (letter.getContent() == null || letter.getContent().trim().isEmpty()) {
+            log.warn("不允许插入空的信件");
+            throw new BizException("无法保存空的信件");
+        }
+
         if (super.save(letter)) {
             log.info("插入letter成功,id为{}", letter.getLetterId());
             //发送信件
