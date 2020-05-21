@@ -48,6 +48,11 @@ public class TreeHole extends Model<TreeHole> {
     private LocalDateTime createTime;
 
 
+    /**
+     * 树洞名称
+     */
+    private String title;
+
     @Override
     protected Serializable pkVal() {
         return this.treeHoleId;

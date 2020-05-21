@@ -10,6 +10,8 @@ import com.verygood.island.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 /**
  * <p>
  * 树洞留言 服务实现类
@@ -43,6 +45,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     @Override
     public int insertMessage(Message message) {
         log.info("正在插入message");
+        message.setTime(LocalDateTime.now());
         if (super.save(message)) {
             log.info("插入message成功,id为{}", message.getMessageId());
             return message.getMessageId();
