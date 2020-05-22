@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -52,6 +53,8 @@ public class TreeHole extends Model<TreeHole> {
      * 树洞名称
      */
     private String title;
+
+
 
     @Override
     protected Serializable pkVal() {
