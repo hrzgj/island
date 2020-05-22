@@ -87,4 +87,12 @@ public interface LetterService {
      */
     List<Letter> getLetterDraft(Integer userId);
 
+    /**
+     * 发送时间胶囊
+     * @param letter 信件实体类
+     * @param userId 发送者id
+     * @return
+     */
+    int sendCapsuleLetter(Letter letter, Integer userId);
+
 }

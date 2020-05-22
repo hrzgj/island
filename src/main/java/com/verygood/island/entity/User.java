@@ -75,6 +75,11 @@ public class User extends Model<User> {
      */
     private String city;
 
+    /**
+     * 胶囊数量
+     */
+    private Integer capsule;
+
 
     @Override
     protected Serializable pkVal() {
