@@ -85,6 +85,11 @@ public class User extends Model<User> {
      */
     private Integer receiveLetter;
 
+    /**
+     * 胶囊数量
+     */
+    private Integer capsule;
+
 
     @Override
     protected Serializable pkVal() {

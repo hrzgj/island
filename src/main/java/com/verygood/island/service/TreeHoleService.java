@@ -2,6 +2,7 @@ package com.verygood.island.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.TreeHole;
+import com.verygood.island.entity.vo.TreeHoleVo;
 
 /**
  * <p>
@@ -34,7 +35,7 @@ public interface TreeHoleService {
      * @author chaos
      * @since 2020-05-21
      */
-    TreeHole getTreeHoleById(int id);
+    TreeHoleVo getTreeHoleById(int id);
 
     /**
      * 插入TreeHole
