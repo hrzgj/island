@@ -135,6 +135,8 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
             log.warn("id为{}的信件已发出，无法更新", letter.getLetterId());
             throw new BizException("信件已发出，无法更新");
         }
+        //不允许更新接收时间
+        letter.setReceiveTime(null);
 
         if (super.updateById(letter)) {
             log.info("更新id为{}的letter成功", letter.getLetterId());
@@ -189,6 +191,14 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
             log.warn("id为{}的信件没有使用邮票", letter.getLetterId());
             throw new BizException("请选择一张邮票进行发信!");
         }
+
+        //统计书写字数
+        if (letter.getContent() == null || letter.getContent().trim().isEmpty()) {
+            log.warn("不允许插入空的信件");
+            throw new BizException("无法发送空的信件");
+        }
+        sender.setWord(sender.getWord() + letter.getContent().trim().length());
+        userMapper.updateById(sender);
 
 
         UpdateWrapper<Stamp> stampUpdateWrapper = new UpdateWrapper<>();
@@ -304,7 +314,8 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
     }
 
     /**
-     *  查询草稿箱列表
+     * 查询草稿箱列表
+     *
      * @param userId 用户id
      * @return : java.util.List<com.verygood.island.entity.Letter>
      * @author : huange7

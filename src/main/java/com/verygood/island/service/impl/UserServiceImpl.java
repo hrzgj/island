@@ -169,6 +169,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         log.info("正在更新id为{}的user", user.getUserId());
         user.setWord(null);
         user.setPhoto(null);
+        user.setSendLetter(null);
+        user.setReceiveLetter(null);
         locationUtils.isValidLocation(user.getCity());
         if (super.updateById(user)) {
             log.info("更新d为{}的user成功", user.getUserId());
