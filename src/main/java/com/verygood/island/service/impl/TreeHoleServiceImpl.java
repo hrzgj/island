@@ -10,6 +10,10 @@ import com.verygood.island.service.TreeHoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.sql.Date;
+import java.time.LocalDateTime;
+
 /**
  * <p>
  * 树洞
@@ -22,6 +26,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> implements TreeHoleService {
+
+    @Resource
+    TreeHoleMapper treeHoleMapper;
 
     @Override
     public Page<TreeHole> listTreeHolesByPage(int page, int pageSize, String factor) {
@@ -44,6 +51,12 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     @Override
     public int insertTreeHole(TreeHole treeHole) {
         log.info("正在插入treeHole");
+        treeHole.setCreateTime(LocalDateTime.now());
+        Integer userTreeNumber=treeHoleMapper.getUserTreeNumber(treeHole.getCreatorId());
+        if(userTreeNumber>=5){
+            log.error("插入treeHole失败，用户树洞超过五个");
+            throw new BizException("用户树洞已有5个，无法添加");
+        }
         if (super.save(treeHole)) {
             log.info("插入treeHole成功,id为{}", treeHole.getTreeHoleId());
             return treeHole.getTreeHoleId();
@@ -54,8 +67,12 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     }
 
     @Override
-    public int deleteTreeHoleById(int id) {
+    public int deleteTreeHoleById(int id,Integer userId) {
         log.info("正在删除id为{}的treeHole", id);
+        if(!userId.equals(treeHoleMapper.getUserIdByTreeId(id))){
+            log.error("更新id为{}的treeHole失败,登录用户与树洞拥有用户不同",id);
+            throw new BizException("登录用户与树洞拥有用户不同");
+        }
         if (super.removeById(id)) {
             log.info("删除id为{}的treeHole成功", id);
             return id;
@@ -68,6 +85,11 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     @Override
     public int updateTreeHole(TreeHole treeHole) {
         log.info("正在更新id为{}的treeHole", treeHole.getTreeHoleId());
+        Integer userId=treeHoleMapper.getUserIdByTreeId(treeHole.getTreeHoleId());
+        if(!userId.equals(treeHole.getCreatorId())){
+            log.error("更新id为{}的treeHole失败,登录用户与树洞拥有用户不同", treeHole.getTreeHoleId());
+            throw new BizException("登录用户与树洞拥有用户不同");
+        }
         if (super.updateById(treeHole)) {
             log.info("更新d为{}的treeHole成功", treeHole.getTreeHoleId());
             return treeHole.getTreeHoleId();

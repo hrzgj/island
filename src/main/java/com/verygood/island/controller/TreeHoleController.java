@@ -2,8 +2,12 @@ package com.verygood.island.controller;
 
 
 import com.verygood.island.entity.TreeHole;
+import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.TreeHoleService;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2020-05-21
  */
 @RestController
-@RequestMapping("/generator/api/v1/tree-hole")
+@RequestMapping("/island/api/v1/tree-hole")
 public class TreeHoleController {
 
     @Autowired
@@ -48,6 +52,11 @@ public class TreeHoleController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody TreeHole treeHole) {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        treeHole.setCreatorId(user.getUserId());
         return new ResultBean<>(treeHoleService.insertTreeHole(treeHole));
     }
 
@@ -56,7 +65,11 @@ public class TreeHoleController {
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
-        return new ResultBean<>(treeHoleService.deleteTreeHoleById(id));
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(treeHoleService.deleteTreeHoleById(id,user.getUserId()));
     }
 
     /**
@@ -64,6 +77,11 @@ public class TreeHoleController {
      */
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody TreeHole treeHole) {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        treeHole.setCreatorId(user.getUserId());
         return new ResultBean<>(treeHoleService.updateTreeHole(treeHole));
     }
 }
