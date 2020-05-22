@@ -54,7 +54,7 @@ public interface TreeHoleService {
      * @author chaos
      * @since 2020-05-21
      */
-    int deleteTreeHoleById(int id,Integer userId);
+    int deleteTreeHoleById(int id, Integer userId);
 
     /**
      * 根据id更新TreeHole
