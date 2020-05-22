@@ -75,6 +75,16 @@ public class User extends Model<User> {
      */
     private String city;
 
+    /**
+     * 发送的信件数量
+     */
+    private Integer sendLetter;
+
+    /**
+     * 接收的信件数量
+     */
+    private Integer receiveLetter;
+
 
     @Override
     protected Serializable pkVal() {
