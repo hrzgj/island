@@ -1,31 +1,32 @@
 package com.verygood.island.controller;
 
 
-import com.verygood.island.entity.Message;
+import com.verygood.island.entity.TreeHole;
 import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
-import com.verygood.island.service.MessageService;
+import com.verygood.island.service.TreeHoleService;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
- * 树洞留言 前端控制器
+ * 树洞
+ * 前端控制器
  * </p>
  *
  * @author chaos
  * @version v1.0
- * @since 2020-05-04
+ * @since 2020-05-21
  */
 @RestController
-@RequestMapping("/island/api/v1/message")
-public class MessageController {
+@RequestMapping("/island/api/v1/tree-hole")
+public class TreeHoleController {
 
     @Autowired
-    private MessageService messageService;
+    private TreeHoleService treeHoleService;
 
     /**
      * 查询分页数据
@@ -34,7 +35,7 @@ public class MessageController {
     public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
                                     @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
                                     @RequestParam(name = "factor", defaultValue = "") String factor) {
-        return new ResultBean<>(messageService.listMessagesByPage(page, pageSize, factor));
+        return new ResultBean<>(treeHoleService.listTreeHolesByPage(page, pageSize, factor));
     }
 
 
@@ -43,20 +44,20 @@ public class MessageController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public ResultBean<?> getById(@PathVariable("id") Integer id) {
-        return new ResultBean<>(messageService.getMessageById(id));
+        return new ResultBean<>(treeHoleService.getTreeHoleById(id));
     }
 
     /**
      * 新增
      */
     @RequestMapping(method = RequestMethod.POST)
-    public ResultBean<?> insert(@RequestBody Message message) {
+    public ResultBean<?> insert(@RequestBody TreeHole treeHole) {
         User user= (User) SecurityUtils.getSubject().getPrincipal();
         if(user==null){
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
-        message.setWriterId(user.getUserId());
-        return new ResultBean<>(messageService.insertMessage(message));
+        treeHole.setCreatorId(user.getUserId());
+        return new ResultBean<>(treeHoleService.insertTreeHole(treeHole));
     }
 
     /**
@@ -64,14 +65,23 @@ public class MessageController {
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
-        return new ResultBean<>(messageService.deleteMessageById(id));
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(treeHoleService.deleteTreeHoleById(id,user.getUserId()));
     }
 
     /**
      * 修改
      */
     @RequestMapping(method = RequestMethod.PUT)
-    public ResultBean<?> updateById(@RequestBody Message message) {
-        return new ResultBean<>(messageService.updateMessage(message));
+    public ResultBean<?> updateById(@RequestBody TreeHole treeHole) {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        treeHole.setCreatorId(user.getUserId());
+        return new ResultBean<>(treeHoleService.updateTreeHole(treeHole));
     }
 }

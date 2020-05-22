@@ -141,6 +141,8 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
             log.warn("id为{}的信件已发出，无法更新", letter.getLetterId());
             throw new BizException("信件已发出，无法更新");
         }
+        //不允许更新接收时间
+        letter.setReceiveTime(null);
 
         if (super.updateById(letter)) {
             log.info("更新id为{}的letter成功", letter.getLetterId());
@@ -169,7 +171,6 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
     private void scheduleLetterSending(Letter letter) {
         log.info("正在创建发信任务");
 
-
         //计算收信时间
         User sender = userMapper.selectById(letter.getSenderId());
         User receiver = userMapper.selectById(letter.getReceiverId());
@@ -196,16 +197,27 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
             throw new BizException("请选择一张邮票进行发信!");
         }
 
-
         UpdateWrapper<Stamp> stampUpdateWrapper = new UpdateWrapper<>();
         stampUpdateWrapper.eq("stamp_id", letter.getStampId())
                 //设置为null,既不属于发信人也不属于收信人
                 .set("user_id", null);
         stampMapper.update(new Stamp(), stampUpdateWrapper);
 
+        //统计书写字数
+        if (letter.getContent() == null || letter.getContent().trim().isEmpty()) {
+            log.warn("不允许插入空的信件");
+            throw new BizException("无法发送空的信件");
+        }
+        sender.setWord(sender.getWord() + letter.getContent().trim().length());
+        //统计写过的信件数量
+        sender.setSendLetter(sender.getSendLetter() + 1);
+        userMapper.updateById(sender);
+
+
         //启动定时任务
         log.info("正在启动定时任务");
-        taskScheduler.schedule(new LetterSendingTask(letter, sender), calculateDuration(distance));
+        taskScheduler.schedule(new LetterSendingTask(letter, sender),
+                calculateDuration(distance));
     }
 
     /**
@@ -238,6 +250,11 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
             //发送信件
             letter.setReceiveTime(LocalDateTime.now());
+            //统计接收到的信件数量
+            User receiver = userMapper.selectById(letter.getReceiverId());
+            receiver.setReceiveLetter(receiver.getReceiveLetter() + 1);
+            userMapper.updateById(receiver);
+
             if (updateById(letter)) {
                 log.info("发送id为{}的letter成功，接收时间：{}", letter.getLetterId(), letter.getReceiveTime());
                 //发送通知
@@ -310,7 +327,8 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
     }
 
     /**
-     *  查询草稿箱列表
+     * 查询草稿箱列表
+     *
      * @param userId 用户id
      * @return : java.util.List<com.verygood.island.entity.Letter>
      * @author : huange7

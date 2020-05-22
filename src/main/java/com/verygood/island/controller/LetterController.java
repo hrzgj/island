@@ -85,7 +85,7 @@ public class LetterController {
     }
 
     /**
-     *不分页获得一名笔友的信件
+    *不分页获得一名笔友的信件
      */
     @RequestMapping(method = RequestMethod.GET,value = "/all")
     public ResultBean<?> getOneFriendLetter(@RequestParam(name = "friendId") Integer friendId){
