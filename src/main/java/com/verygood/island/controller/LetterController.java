@@ -7,7 +7,6 @@ import com.verygood.island.entity.dto.ResultBean;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.LetterService;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -108,6 +107,19 @@ public class LetterController {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         return new ResultBean<>(letterService.getLetterDraft(user.getUserId()));
+    }
+
+    /**
+     * 发送时间胶囊
+     * @param letter 时间胶囊
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/capsule")
+    public ResultBean<?> sendCapsule(@RequestBody Letter letter){
+        User user = (User)SecurityUtils.getSubject().getPrincipal();
+        if (user == null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(letterService.sendCapsuleLetter(letter, user.getUserId()));
     }
 
 }

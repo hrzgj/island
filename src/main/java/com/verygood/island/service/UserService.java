@@ -2,6 +2,7 @@ package com.verygood.island.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.User;
+import com.verygood.island.entity.vo.UserVo;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -45,7 +46,7 @@ public interface UserService {
      * @author chaos
      * @since 2020-05-04
      */
-    User getUserById(int id);
+    UserVo getUserById(int id);
 
     /**
      * 插入User

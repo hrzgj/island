@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.constant.Constants;
 import com.verygood.island.entity.Stamp;
 import com.verygood.island.entity.User;
+import com.verygood.island.entity.vo.UserVo;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.StampService;
@@ -15,6 +16,8 @@ import com.verygood.island.util.Md5Util;
 import com.verygood.island.util.UploadUtils;
 import com.verygood.island.util.LocationUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,11 +99,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public User getUserById(int id) {
+    public UserVo getUserById(int id) {
         log.info("正在查询user中id为{}的数据", id);
         User user = super.getById(id);
         log.info("查询id为{}的user{}", id, (null == user ? "无结果" : "成功"));
-        return user;
+        if (null == user){
+            return null;
+        }
+        // 隐藏密码和邮箱
+        user.setPassword("").setMail("");
+
+        // 查看自己的信息
+        User self = (User) SecurityUtils.getSubject().getPrincipal();
+
+        // 新建一个返回的vo
+        UserVo userVo = new UserVo();
+        BeanUtils.copyProperties(user, userVo);
+
+        // 查看是否是查询自己的信息
+        if (self.getUserId() == id){
+            userVo.setDistance(0L);
+        }else {
+            userVo.setDistance(locationUtils.getDistance(self.getCity(), user.getCity()));
+        }
+
+        return userVo;
+
+
     }
 
     @Override
@@ -129,6 +154,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.info("插入数据时检测到账号【{}】已经存在！插入失败", user.getUsername());
             throw new BizException("该账号已经存在");
         }
+
+        // 设置三个时间胶囊
+        user.setCapsule(Constants.INIT_CAPSULE_NUMBER);
 
         // 对密码进行加密
         user.setPassword(Md5Util.getMd5String(user.getPassword()));

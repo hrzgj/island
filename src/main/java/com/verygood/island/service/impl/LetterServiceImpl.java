@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.verygood.island.constant.Constants;
 import com.verygood.island.entity.Letter;
 import com.verygood.island.entity.Notice;
 import com.verygood.island.entity.Stamp;
@@ -14,11 +15,15 @@ import com.verygood.island.mapper.NoticeMapper;
 import com.verygood.island.mapper.StampMapper;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.LetterService;
+import com.verygood.island.task.CapsuleSendingTask;
 import com.verygood.island.util.LocationUtils;
+import com.verygood.island.util.RedisUtils;
+import com.verygood.island.util.ScheduledUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -51,6 +56,9 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
     @Autowired
     private StampMapper stampMapper;
 
+    @Autowired
+    private ScheduledUtils scheduledUtils;
+
 
     @Override
     public Page<Letter> listLettersByPage(int page, int pageSize, Integer friendId, Integer userId) {
@@ -78,10 +86,8 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         //不允许输入信件接收时间
         letter.setReceiveTime(null);
 
-        if (letter.getContent() == null || letter.getContent().trim().isEmpty()) {
-            log.warn("不允许插入空的信件");
-            throw new BizException("无法保存空的信件");
-        }
+        // 校验信件
+        checkLetter(letter);
 
         if (super.save(letter)) {
             log.info("插入letter成功,id为{}", letter.getLetterId());
@@ -332,7 +338,81 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
     public List<Letter> getLetterDraft(Integer userId) {
         log.info("开始执行查询用户【{}】的草稿列表：", userId);
         return super.list(new QueryWrapper<Letter>().eq("sender_id", userId)
-                .eq("is_send", false));
+                // 未发送的信件，即为草稿
+                .eq("is_send", false)
+                // 接收方不是自己，即排除时间胶囊
+                .ne("receiver_id", userId));
 
+    }
+
+    @Override
+    public int sendCapsuleLetter(Letter letter, Integer userId) {
+        log.info("开始执行发送时间胶囊：【{}】", letter);
+
+        if (StringUtils.isEmpty(letter.getContent()) || letter.getSendTime() == null){
+            log.info("发送时间胶囊时内容为空或者发送时间为空！");
+            throw new BizException("时间胶囊内容或者胶囊的发送时间不应为空");
+        }
+
+        // 校验信件
+        checkLetter(letter);
+
+        // 查看发送时间是否在当前时间之前
+        if (letter.getSendTime().isBefore(LocalDateTime.now())){
+            log.info("发送时间胶囊时检测到发送时间为当前时间之前");
+            throw new BizException("发送时间不可以在当前时间之前");
+        }
+
+        User user = userMapper.selectById(userId);
+
+        if (user == null){
+            throw new BizException("不存在该用户信息");
+        }
+
+        // 检测剩余的时间胶囊数量
+        if (user.getCapsule() <= 0){
+            log.info("发送时间胶囊时检测到时间胶囊数不足");
+            throw new BizException("时间胶囊数量不足，无法发送时间胶囊");
+        }
+
+        int taskCount = super.count(new QueryWrapper<Letter>()
+                .eq("sender_id", userId)
+                .eq("receiver_id", userId)
+                .isNull("receive_time"));
+
+        if (taskCount >= user.getCapsule()){
+            log.info("发送时间胶囊时检测到定时任务数量已经达到可以消耗的时间胶囊数量上限");
+            throw new BizException("当前的定时任务数量已经到达上限！");
+        }
+
+        // 设置相关属性
+        letter.setSenderId(userId);
+        letter.setReceiverId(userId);
+        letter.setIsSend(true);
+        letter.setStampId(0);
+
+        if (super.save(letter)) {
+            log.info("插入letter成功,id为{}", letter.getLetterId());
+            //发送信件
+            scheduledUtils.addTask(letter.getSendTime(), new CapsuleSendingTask(letter));
+            return letter.getLetterId();
+        } else {
+            log.error("插入letter失败");
+            throw new BizException("保存失败");
+        }
+    }
+
+    private void checkLetter(Letter letter){
+        // 校验信件标题
+        if (StringUtils.isEmpty(letter.getHeader()) || letter.getHeader().length() > Constants.LETTER_HEADER_MAX_LENGTH){
+            log.info("发送信件时信件标题为空或者信件标题长度过长");
+            throw new BizException("信件标题不应为空或者长度不应超过10个字");
+        }
+
+        // 校验信件内容
+        if (StringUtils.isEmpty(letter.getContent()) || letter.getContent().length() > Constants.LETTER_CONTENT_MAX_LENGTH){
+            log.info("发送信件时信件内容为空或者信件内容长度过长");
+            throw new BizException("信件内容不应为空或者长度不应超过60000个字");
+        }
     }
 }
