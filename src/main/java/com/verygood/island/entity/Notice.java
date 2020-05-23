@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -49,6 +50,11 @@ public class Notice extends Model<Notice> {
      * 通知标题
      */
     private String title;
+
+    /**
+     * 发送时间
+     */
+    private LocalDateTime time;
 
 
     @Override
