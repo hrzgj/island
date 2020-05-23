@@ -12,6 +12,7 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -31,14 +32,15 @@ public class UserController {
     private UserService userService;
 
     /**
-     * 查询分页数据
+     * 搜索分页数据
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
-                                    @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-                                    @RequestParam(name = "factor", defaultValue = "") String factor) {
-        return new ResultBean<>(userService.listUsersByPage(page, pageSize, factor));
+    public ResultBean<?> searchByPage(@RequestParam(name = "page", defaultValue = "1") int page,
+                                      @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+                                      @RequestParam(name = "factor") String factor) {
+        return new ResultBean<>(userService.searchUsersByPage(page, pageSize, factor));
     }
+
 
 
     /**
@@ -47,6 +49,14 @@ public class UserController {
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public ResultBean<?> getById(@PathVariable("id") Integer id) {
         return new ResultBean<>(userService.getUserById(id));
+    }
+
+    /**
+     * 随机获取
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/random")
+    public ResultBean<?> getByRandom() {
+        return new ResultBean<>(userService.getUserByRandom());
     }
 
     /**
@@ -70,8 +80,8 @@ public class UserController {
      */
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody User user) {
-        User principal= (User) SecurityUtils.getSubject().getPrincipal();
-        if(principal==null){
+        User principal = (User) SecurityUtils.getSubject().getPrincipal();
+        if (principal == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         user.setUserId(principal.getUserId());
@@ -82,7 +92,7 @@ public class UserController {
      * 登录
      */
     @RequestMapping(method = RequestMethod.POST, value = "/login")
-    public ResultBean<?> login(@RequestBody User user, HttpServletResponse response){
+    public ResultBean<?> login(@RequestBody User user, HttpServletResponse response) {
         Subject subject = SecurityUtils.getSubject();
         subject.login(new UserToken(user.getUsername(), user.getPassword()));
         user = (User) subject.getPrincipal();
@@ -94,10 +104,10 @@ public class UserController {
      * 上传头像
      */
     @RequestMapping(method = RequestMethod.POST, value = "/upload")
-    public ResultBean<?> login(@RequestParam MultipartFile file){
+    public ResultBean<?> login(@RequestParam MultipartFile file) {
         Subject subject = SecurityUtils.getSubject();
         User user = (User) subject.getPrincipal();
-        if (user == null){
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         return new ResultBean<>(userService.uploadIcon(file, user.getUserId()));
