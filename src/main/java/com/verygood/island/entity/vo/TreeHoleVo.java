@@ -15,7 +15,10 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class TreeHoleVo extends TreeHole {
+public class TreeHoleVo  {
+
+
+    private TreeHole hole;
 
     /*
      *树洞下的留言内容
