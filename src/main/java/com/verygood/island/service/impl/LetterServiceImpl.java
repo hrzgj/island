@@ -6,27 +6,23 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.constant.Constants;
 import com.verygood.island.entity.Letter;
-import com.verygood.island.entity.Notice;
 import com.verygood.island.entity.Stamp;
 import com.verygood.island.entity.User;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.LetterMapper;
-import com.verygood.island.mapper.NoticeMapper;
 import com.verygood.island.mapper.StampMapper;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.LetterService;
 import com.verygood.island.task.CapsuleSendingTask;
+import com.verygood.island.task.LetterSendingTask;
 import com.verygood.island.util.LocationUtils;
-import com.verygood.island.util.RedisUtils;
 import com.verygood.island.util.ScheduledUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,17 +37,12 @@ import java.util.List;
 @Service
 public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> implements LetterService {
 
-    @Autowired
-    private TaskScheduler taskScheduler;
 
     @Autowired
     private LocationUtils locationUtils;
 
     @Autowired
     private UserMapper userMapper;
-
-    @Autowired
-    private NoticeMapper noticeMapper;
 
     @Autowired
     private StampMapper stampMapper;
@@ -188,7 +179,7 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         //消耗邮票
         if (letter.getSenderId() != null) {
             Stamp stamp = stampMapper.selectById(letter.getStampId());
-            if (stamp == null || !stamp.getUserId().equals(sender.getUserId())) {
+            if (stamp == null || stamp.getUserId() == null || !stamp.getUserId().equals(sender.getUserId())) {
                 log.warn("id为{}的信件没有使用有效邮票，无法发信", letter.getLetterId());
                 throw new BizException("发信失败，缺少有效的邮票");
             }
@@ -216,105 +207,10 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
         //启动定时任务
         log.info("正在启动定时任务");
-        taskScheduler.schedule(new LetterSendingTask(letter, sender),
-                calculateDuration(distance));
-    }
-
-    /**
-     * 定时发送信件任务
-     *
-     * @author <a href="mailto:kobe524348@gmail.com">黄钰朝</a>
-     * @date 2020-05-08
-     */
-    private class LetterSendingTask implements Runnable {
-
-        /**
-         * 要定时发送的信件
-         */
-        private final Letter letter;
-
-        /**
-         * 写信人
-         */
-        private final User sender;
-
-        public LetterSendingTask(Letter letter, User sender) {
-            this.letter = letter;
-            this.sender = sender;
-        }
-
-        @Override
-        public void run() {
-            //消耗邮票
-            this.useStamp();
-
-            //发送信件
-            letter.setReceiveTime(LocalDateTime.now());
-            //统计接收到的信件数量
-            User receiver = userMapper.selectById(letter.getReceiverId());
-            receiver.setReceiveLetter(receiver.getReceiveLetter() + 1);
-            userMapper.updateById(receiver);
-
-            if (updateById(letter)) {
-                log.info("发送id为{}的letter成功，接收时间：{}", letter.getLetterId(), letter.getReceiveTime());
-                //发送通知
-                this.sendNotice();
-            } else {
-                log.error("发送id为{}的letter失败", letter.getLetterId());
-                throw new BizException("发送失败[id=" + letter.getLetterId() + "]");
-            }
-        }
-
-        /**
-         * 使用邮票
-         */
-        private void useStamp() {
-            Stamp stamp = new Stamp();
-            stamp.setStampId(letter.getStampId());
-            stamp.setUserId(letter.getReceiverId());
-            stampMapper.updateById(stamp);
-            log.info("使用id为{}的邮票成功", stamp.getStampId());
-        }
-
-        /**
-         * 发送通知
-         */
-        private void sendNotice() {
-            Notice notice = new Notice();
-            notice.setTitle("收信通知");
-            String content = "你收到一封来自" + sender.getNickname() + "的信件，快去查收吧！";
-            notice.setContent(content);
-            notice.setUserId(letter.getReceiverId());
-            noticeMapper.insert(notice);
-            log.info("发送notice成功，内容为{}", content);
-        }
+        scheduledUtils.addTask(calculateReceiveTime(distance), new LetterSendingTask(letter));
     }
 
 
-    /**
-     * 根据距离计算发信时间
-     *
-     * @param distance 距离，单位：米
-     * @return 返回经过这段距离需要的发信时间
-     * @name calculateDuration
-     * @notice none
-     * @author <a href="mailto:kobe524348@gmail.com">黄钰朝</a>
-     * @date 2020-05-08
-     */
-    private Date calculateDuration(long distance) {
-        //每小时经过的距离
-        int milePerHour = 417660;
-        int hour = (int) (distance / milePerHour);
-        Date date = new Date();
-        if (hour == 0) {
-            //最少需要1分钟
-            date.setMinutes(date.getMinutes() + 1);
-        } else {
-            date.setHours(date.getHours() + hour);
-        }
-        log.info("预计收信时间: {}", date);
-        return date;
-    }
 
 
     @Override
@@ -365,12 +261,12 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
         User user = userMapper.selectById(userId);
 
-        if (user == null){
+        if (user == null) {
             throw new BizException("不存在该用户信息");
         }
 
         // 检测剩余的时间胶囊数量
-        if (user.getCapsule() <= 0){
+        if (user.getCapsule() <= 0) {
             log.info("发送时间胶囊时检测到时间胶囊数不足");
             throw new BizException("时间胶囊数量不足，无法发送时间胶囊");
         }
@@ -380,7 +276,7 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
                 .eq("receiver_id", userId)
                 .isNull("receive_time"));
 
-        if (taskCount >= user.getCapsule()){
+        if (taskCount >= user.getCapsule()) {
             log.info("发送时间胶囊时检测到定时任务数量已经达到可以消耗的时间胶囊数量上限");
             throw new BizException("当前的定时任务数量已经到达上限！");
         }
@@ -403,17 +299,48 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         }
     }
 
-    private void checkLetter(Letter letter){
+    /**
+     * 校验信件内容
+     * @param letter
+     */
+    private void checkLetter(Letter letter) {
         // 校验信件标题
-        if (StringUtils.isEmpty(letter.getHeader()) || letter.getHeader().length() > Constants.LETTER_HEADER_MAX_LENGTH){
+        if (StringUtils.isEmpty(letter.getHeader()) || letter.getHeader().length() > Constants.LETTER_HEADER_MAX_LENGTH) {
             log.info("发送信件时信件标题为空或者信件标题长度过长");
-            throw new BizException("信件标题不应为空或者长度不应超过10个字");
+            throw new BizException("信件标题不应为空并且长度不应超过10个字");
         }
 
         // 校验信件内容
-        if (StringUtils.isEmpty(letter.getContent()) || letter.getContent().length() > Constants.LETTER_CONTENT_MAX_LENGTH){
+        if (StringUtils.isEmpty(letter.getContent()) || letter.getContent().length() > Constants.LETTER_CONTENT_MAX_LENGTH) {
             log.info("发送信件时信件内容为空或者信件内容长度过长");
-            throw new BizException("信件内容不应为空或者长度不应超过60000个字");
+            throw new BizException("信件内容不应为空并且长度不应超过60000个字");
         }
     }
+
+    /**
+     * 根据距离计算发信时间
+     *
+     * @param distance 距离，单位：米
+     * @return 返回经过这段距离需要的发信时间
+     * @name calculateDuration
+     * @notice none
+     * @author <a href="mailto:kobe524348@gmail.com">黄钰朝</a>
+     * @date 2020-05-08
+     */
+    private LocalDateTime calculateReceiveTime(long distance) {
+        //每小时经过的距离
+        int milePerHour = 417660;
+        int hour = (int) (distance / milePerHour);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime receiveTime = null;
+        if (hour == 0) {
+            //最少需要1分钟
+            receiveTime = now.plusMinutes(1);
+        } else {
+            receiveTime = now.plusHours(hour);
+        }
+        log.info("预计收信时间: {}", receiveTime);
+        return receiveTime;
+    }
+
 }
