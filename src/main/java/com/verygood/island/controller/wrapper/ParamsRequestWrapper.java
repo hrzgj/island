@@ -2,7 +2,7 @@ package com.verygood.island.controller.wrapper;
 
 import com.verygood.island.exception.bizException.BizException;
 import lombok.extern.slf4j.Slf4j;
-import org.andy.sensitivewdfilter.WordFilter;
+//import org.andy.sensitivewdfilter.WordFilter;
 import org.apache.http.entity.ContentType;
 import org.apache.poi.util.IOUtils;
 import org.springframework.web.util.HtmlUtils;
@@ -45,7 +45,7 @@ public class ParamsRequestWrapper extends HttpServletRequestWrapper {
             //获取文本数据;
             this.content = IOUtils.toByteArray(request.getInputStream());
             //过滤请求体
-            this.modifyInputStream();
+//            this.modifyInputStream();
         }
     }
 
@@ -77,15 +77,15 @@ public class ParamsRequestWrapper extends HttpServletRequestWrapper {
      * @author <a href="mailto:kobe524348@gmail.com">黄钰朝</a>
      * @date 2020-05-22
      */
-    private void modifyInputStream() {
-        //对json字符串进行处理
-        //过滤敏感词
-        String strContent = new String(this.content);
-        if (WordFilter.isContains(strContent)) {
-            log.warn("内容包含敏感词:" + strContent);
-            throw new BizException("您输入的内容包含敏感词，请重新输入");
-        }
-    }
+//    private void modifyInputStream() {
+//        //对json字符串进行处理
+//        //过滤敏感词
+//        String strContent = new String(this.content);
+//        if (WordFilter.isContains(strContent)) {
+//            log.warn("内容包含敏感词:" + strContent);
+//            throw new BizException("您输入的内容包含敏感词，请重新输入");
+//        }
+//    }
 
     @Override
     public String[] getParameterValues(String name) {
