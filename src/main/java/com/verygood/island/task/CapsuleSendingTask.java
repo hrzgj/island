@@ -24,7 +24,7 @@ public class CapsuleSendingTask implements Runnable {
     private final Letter letter;
 
     public CapsuleSendingTask() {
-        letter = new Letter();
+        letter = null;
     }
 
     /**
@@ -61,11 +61,22 @@ public class CapsuleSendingTask implements Runnable {
         Notice notice = new Notice();
         NoticeMapper noticeMapper = BeanUtils.getBean(NoticeMapper.class);
         notice.setTitle("时间胶囊通知");
-        String content = "你收到一个来自自己的时间胶囊，快去查收吧！";
+        String content = "你收到一个来自" + transferDate(letter.getSendTime()) + "的时间胶囊，快去查收吧！";
         notice.setContent(content);
         notice.setUserId(letter.getReceiverId());
         noticeMapper.insert(notice);
         log.info("发送notice成功，内容为{}", content);
+    }
+
+    /**
+     * 时间转换工具
+     * @param time 将时间转换为中文格式
+     * @return 字符串
+     */
+    private String transferDate(LocalDateTime time){
+        return time.getYear() + "年" +
+                time.getMonth().getValue() + "月" +
+                time.getDayOfMonth() + "日";
     }
 
     /**
