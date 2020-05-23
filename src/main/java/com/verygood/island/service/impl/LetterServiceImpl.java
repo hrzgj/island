@@ -245,18 +245,18 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
     public int sendCapsuleLetter(Letter letter, Integer userId) {
         log.info("开始执行发送时间胶囊：【{}】", letter);
 
-        if (StringUtils.isEmpty(letter.getContent()) || letter.getSendTime() == null) {
-            log.info("发送时间胶囊时内容为空或者发送时间为空！");
-            throw new BizException("时间胶囊内容或者胶囊的发送时间不应为空");
+        if (StringUtils.isEmpty(letter.getContent()) || letter.getReceiveTime() == null){
+            log.info("发送时间胶囊时内容为空或者接收时间为空！");
+            throw new BizException("时间胶囊内容或者胶囊的接收时间不应为空");
         }
 
         // 校验信件
         checkLetter(letter);
 
         // 查看发送时间是否在当前时间之前
-        if (letter.getSendTime().isBefore(LocalDateTime.now())) {
-            log.info("发送时间胶囊时检测到发送时间为当前时间之前");
-            throw new BizException("发送时间不可以在当前时间之前");
+        if (letter.getReceiveTime().isBefore(LocalDateTime.now())){
+            log.info("发送时间胶囊时检测到接收时间为当前时间之前");
+            throw new BizException("接收时间不可以在当前时间之前");
         }
 
         User user = userMapper.selectById(userId);
@@ -286,11 +286,12 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         letter.setReceiverId(userId);
         letter.setIsSend(true);
         letter.setStampId(0);
+        letter.setSendTime(LocalDateTime.now());
 
         if (super.save(letter)) {
             log.info("插入letter成功,id为{}", letter.getLetterId());
             //发送信件
-            scheduledUtils.addTask(letter.getSendTime(), new CapsuleSendingTask(letter));
+            scheduledUtils.addTask(letter.getReceiveTime(), new CapsuleSendingTask(letter));
             return letter.getLetterId();
         } else {
             log.error("插入letter失败");
