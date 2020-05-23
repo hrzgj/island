@@ -71,14 +71,14 @@ public class CapsuleSendingTask implements Runnable {
     /**
      * 减去对应的时间胶囊
      */
-    private void reduceCapsule(){
+    private void reduceCapsule() {
         UserMapper userMapper = BeanUtils.getBean(UserMapper.class);
         User user = userMapper.selectById(letter.getSenderId());
-        if (user == null){
+        if (user == null) {
             log.info("减去时间胶囊时发送错误！不存在该用户");
             return;
         }
-        if (user.getCapsule() <= 0){
+        if (user.getCapsule() <= 0) {
             log.info("减去时间胶囊时发送错误！胶囊数量不足");
             return;
         }
