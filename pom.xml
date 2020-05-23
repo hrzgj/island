@@ -19,7 +19,11 @@
     </properties>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.andy</groupId>
+            <artifactId>sensitivewd-filter</artifactId>
+            <version>0.0.1-RELEASE</version>
+        </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
