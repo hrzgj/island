@@ -23,7 +23,9 @@ import javax.servlet.http.HttpServletResponse;
 public class GlobalExceptionHandler implements HandlerExceptionResolver {
 
     @Override
-    public ModelAndView resolveException(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
+    public ModelAndView resolveException(HttpServletRequest httpServletRequest,
+                                         HttpServletResponse httpServletResponse,
+                                         Object o, Exception e) {
         log.info("请求异常" + e.getMessage());
         e.printStackTrace();
         return null;
@@ -53,8 +55,10 @@ public class GlobalExceptionHandler implements HandlerExceptionResolver {
     }
 
 
-    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
-    public ResultBean<?> maxUploadexception(org.springframework.web.multipart.MaxUploadSizeExceededException e) {
+    @ExceptionHandler(
+            org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResultBean<?> maxUploadexception(
+            org.springframework.web.multipart.MaxUploadSizeExceededException e) {
         e.printStackTrace();
         return new ResultBean<>(new BizException("您上传的文件大小超过限制"));
     }
@@ -66,22 +70,26 @@ public class GlobalExceptionHandler implements HandlerExceptionResolver {
     }
 
     @ExceptionHandler(
-            {org.springframework.http.converter.HttpMessageNotReadableException.class,
-                    org.springframework.web.bind.MissingServletRequestParameterException.class,
-                    org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class})
+            {org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,
+                    org.springframework.http.converter.HttpMessageNotReadableException.class,
+                    org.springframework.web.bind.MissingServletRequestParameterException.class})
     public ResultBean<?> http400Handler(Exception e) {
         e.printStackTrace();
         return new ResultBean<>(new BizException("您的请求错误，缺少请求体或格式错误"));
     }
 
-    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
-    public ResultBean<?> http405Handler(org.springframework.web.HttpRequestMethodNotSupportedException e) {
+    @ExceptionHandler(
+            org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    public ResultBean<?> http405Handler(
+            org.springframework.web.HttpRequestMethodNotSupportedException e) {
         e.printStackTrace();
         return new ResultBean<>(new BizException("服务器并不支持您所使用的请求方法"));
     }
 
-    @ExceptionHandler(org.springframework.web.HttpMediaTypeNotSupportedException.class)
-    public ResultBean<?> http405Handler(org.springframework.web.HttpMediaTypeNotSupportedException e) {
+    @ExceptionHandler(
+            org.springframework.web.HttpMediaTypeNotSupportedException.class)
+    public ResultBean<?> http405Handler(
+            org.springframework.web.HttpMediaTypeNotSupportedException e) {
         e.printStackTrace();
         return new ResultBean<>(new BizException("您的请求体格式不正确"));
     }
