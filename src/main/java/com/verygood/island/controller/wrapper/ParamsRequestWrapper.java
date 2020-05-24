@@ -45,7 +45,7 @@ public class ParamsRequestWrapper extends HttpServletRequestWrapper {
             //获取文本数据;
             this.content = IOUtils.toByteArray(request.getInputStream());
             //过滤请求体
-//            this.modifyInputStream();
+            this.modifyInputStream();
         }
     }
 
