@@ -1,5 +1,6 @@
 package com.verygood.island.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.entity.TreeHole;
@@ -41,7 +42,9 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     public Page<TreeHole> listTreeHolesByPage(int page, int pageSize) {
         log.info("正在执行分页查询treeHole: page = {} pageSize = {} ", page, pageSize);
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
-        Page<TreeHole> result = super.page(new Page<>(page, pageSize));
+        QueryWrapper<TreeHole> queryWrapper=new QueryWrapper<>();
+        queryWrapper.orderByDesc("create_time");
+        Page<TreeHole> result = super.page(new Page<>(page, pageSize),queryWrapper);
         log.info("分页查询treeHole完毕: 结果数 = {} ", result.getRecords().size());
         return result;
     }
