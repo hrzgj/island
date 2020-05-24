@@ -1,7 +1,5 @@
 package com.verygood.island.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.entity.TreeHole;
@@ -11,13 +9,13 @@ import com.verygood.island.mapper.MessageMapper;
 import com.verygood.island.mapper.TreeHoleMapper;
 import com.verygood.island.service.TreeHoleService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,9 +38,8 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     MessageMapper messageMapper;
 
     @Override
-    public Page<TreeHole> listTreeHolesByPage(int page, int pageSize, String factor) {
-        log.info("正在执行分页查询treeHole: page = {} pageSize = {} factor = {}", page, pageSize, factor);
-        QueryWrapper<TreeHole> queryWrapper = new QueryWrapper<TreeHole>().like("", factor);
+    public Page<TreeHole> listTreeHolesByPage(int page, int pageSize) {
+        log.info("正在执行分页查询treeHole: page = {} pageSize = {} ", page, pageSize);
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
         Page<TreeHole> result = super.page(new Page<>(page, pageSize));
         log.info("分页查询treeHole完毕: 结果数 = {} ", result.getRecords().size());
@@ -53,6 +50,9 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     public TreeHoleVo getTreeHoleById(int id) {
         log.info("正在查询treeHole中id为{}的数据", id);
         TreeHole treeHole = super.getById(id);
+        if(treeHole==null){
+            return null;
+        }
         TreeHoleVo treeHoleVo=new TreeHoleVo();
         treeHoleVo.setHole(treeHole);
         Map<String,Object> map=new HashMap<>();
@@ -111,6 +111,14 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
             log.error("更新id为{}的treeHole失败", treeHole.getTreeHoleId());
             throw new BizException("更新失败[id=" + treeHole.getTreeHoleId() + "]");
         }
+    }
+
+    @Override
+    public List<TreeHole> getByUserId(Integer userId) {
+        log.info("正在查询用户id为{}的树洞",userId);
+        Map<String, Object> map=new HashMap<>();
+        map.put("creator_id",userId);
+        return treeHoleMapper.selectByMap(map);
     }
 
 }
