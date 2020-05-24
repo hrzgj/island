@@ -1,7 +1,9 @@
 package com.verygood.island.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.constant.Constants;
@@ -54,15 +56,27 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
 
     @Override
-    public Page<Letter> listLettersByPage(int page, int pageSize, Integer friendId, Integer userId) {
+    public Page<LetterVo> listLettersByPage(int page, int pageSize, Integer friendId, Integer userId) {
         log.info("正在执行分页查询letter: page = {} pageSize = {} friendId = {} userId = {}", page, pageSize, friendId, userId);
         QueryWrapper<Letter> queryWrapper = new QueryWrapper<>();
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
         queryWrapper.eq("sender_id", friendId).eq("receiver_id", userId)
                 .or().eq("receiver_id", friendId).eq("sender_id", userId);
         Page<Letter> result = super.page(new Page<>(page, pageSize), queryWrapper);
-        log.info("分页查询letter完毕: 结果数 = {} ", result.getRecords().size());
-        return result;
+        //转vo
+        Page<LetterVo> voPage=new Page<>();
+        List<LetterVo> voList=new ArrayList<>(voPage.getRecords().size());
+        for(Letter letter:result.getRecords()){
+            LetterVo letterVo=new LetterVo();
+            letterVo.setLetter(letter);
+            letterVo.setStampName(stampMapper.getStampNameByStampId(letter.getStampId()));
+            letterVo.setNickname(userMapper.getNicknameByUserId(letter.getSenderId()));
+            voList.add(letterVo);
+        }
+        BeanUtil.copyProperties(result,voPage);
+        voPage.setRecords(voList);
+        log.info("分页查询letter完毕: 结果数 = {} ", voPage.getRecords().size());
+        return voPage;
     }
 
     @Override
@@ -213,6 +227,8 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
     }
 
 
+
+
     @Override
     public List<LetterVo> getOneFriendLetter(Integer friendId, Integer userId) {
         //得到互送的信件
@@ -220,8 +236,12 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         QueryWrapper<Letter> queryWrapper = new QueryWrapper<Letter>().eq("sender_id", friendId).eq("receiver_id", userId)
                 .or().eq("receiver_id", friendId).eq("sender_id", userId);
 
-        List<Letter> letters = super.list(queryWrapper);
-        List<LetterVo> letterVos = new ArrayList<>(letters.size());
+       List<Letter> letters=super.list(queryWrapper);
+       //判空
+       if(letters==null){
+           throw new BizException("没有互送信件");
+       }
+       List<LetterVo> letterVos=new ArrayList<>(letters.size());
         for (Letter letter : letters) {
             LetterVo letterVo = new LetterVo();
             letterVo.setLetter(letter);
@@ -229,7 +249,7 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
             letterVo.setStampName(stampMapper.getStampNameByStampId(letterVo.getLetter().getStampId()));
             letterVos.add(letterVo);
         }
-        return letterVos;
+       return letterVos;
     }
 
     /**
@@ -255,7 +275,7 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
     public int sendCapsuleLetter(Letter letter, Integer userId) {
         log.info("开始执行发送时间胶囊：【{}】", letter);
 
-        if (StringUtils.isEmpty(letter.getContent()) || letter.getReceiveTime() == null) {
+        if (StringUtils.isEmpty(letter.getContent()) || letter.getReceiveTime() == null){
             log.info("发送时间胶囊时内容为空或者接收时间为空！");
             throw new BizException("时间胶囊内容或者胶囊的接收时间不应为空");
         }
@@ -264,7 +284,7 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         checkLetter(letter);
 
         // 查看发送时间是否在当前时间之前
-        if (letter.getReceiveTime().isBefore(LocalDateTime.now())) {
+        if (letter.getReceiveTime().isBefore(LocalDateTime.now())){
             log.info("发送时间胶囊时检测到接收时间为当前时间之前");
             throw new BizException("接收时间不可以在当前时间之前");
         }
@@ -311,7 +331,6 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
     /**
      * 校验信件内容
-     *
      * @param letter
      */
     private void checkLetter(Letter letter) {

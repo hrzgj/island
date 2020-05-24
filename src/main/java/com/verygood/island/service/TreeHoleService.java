@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.TreeHole;
 import com.verygood.island.entity.vo.TreeHoleVo;
 
+import java.util.List;
+
 /**
  * <p>
  * 树洞
@@ -20,12 +22,11 @@ public interface TreeHoleService {
      *
      * @param page     当前页数
      * @param pageSize 页的大小
-     * @param factor   搜索关键词
      * @return 返回mybatis-plus的Page对象,其中records字段为符合条件的查询结果
      * @author chaos
      * @since 2020-05-21
      */
-    Page<TreeHole> listTreeHolesByPage(int page, int pageSize, String factor);
+    Page<TreeHole> listTreeHolesByPage(int page, int pageSize);
 
     /**
      * 根据id查询TreeHole
@@ -66,5 +67,15 @@ public interface TreeHoleService {
      * @since 2020-05-21
      */
     int updateTreeHole(TreeHole treeHole);
+
+    /**
+     * 根据用户id查看用户自己的树洞
+     *
+     * @param userId 用户id
+     * @return TreeHole对象集合
+     * @author cy
+     * @since 2020-05-24
+     */
+    List<TreeHole> getByUserId(Integer userId);
 
 }

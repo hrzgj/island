@@ -26,7 +26,7 @@ public interface LetterService {
      * @author chaos
      * @since 2020-05-04
      */
-    Page<Letter> listLettersByPage(int page, int pageSize, Integer friendId, Integer userId);
+    Page<LetterVo> listLettersByPage(int page, int pageSize, Integer friendId, Integer userId);
 
     /**
      * 根据id查询Letter
