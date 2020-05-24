@@ -11,7 +11,10 @@ import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.StampService;
 import com.verygood.island.service.UserService;
-import com.verygood.island.util.*;
+import com.verygood.island.util.ImageUtils;
+import com.verygood.island.util.LocationUtils;
+import com.verygood.island.util.Md5Util;
+import com.verygood.island.util.UploadUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.BeanUtils;
@@ -45,9 +48,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     StampService stampService;
-
-    @Resource
-    RedisUtils redisUtils;
 
 
     List<User> users = null;
