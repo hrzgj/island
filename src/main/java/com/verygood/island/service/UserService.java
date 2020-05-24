@@ -26,6 +26,7 @@ public interface UserService {
      */
     User login(User user);
 
+
     /**
      * 分页查询User
      *
@@ -36,7 +37,7 @@ public interface UserService {
      * @author chaos
      * @since 2020-05-04
      */
-    Page<User> listUsersByPage(int page, int pageSize, String factor);
+    Page<UserVo> searchUsersByPage(int page, int pageSize, String factor);
 
     /**
      * 根据id查询User
@@ -47,6 +48,17 @@ public interface UserService {
      * @since 2020-05-04
      */
     UserVo getUserById(int id);
+
+
+    /**
+     * 随机获取用户
+     *
+     * @return 返回一个用户
+     * @notice none
+     * @author <a href="mailto:kobe524348@gmail.com">黄钰朝</a>
+     * @date 2020-05-23
+     */
+    UserVo getUserByRandom();
 
     /**
      * 插入User
@@ -80,7 +92,8 @@ public interface UserService {
 
     /**
      * 上传用户头像
-     * @param file 头像文件
+     *
+     * @param file   头像文件
      * @param userId 用户Id信息
      * @return : java.lang.String
      * @author : huange7
