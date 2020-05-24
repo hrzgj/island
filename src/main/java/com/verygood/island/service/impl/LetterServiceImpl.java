@@ -1,5 +1,6 @@
 package com.verygood.island.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,6 +9,7 @@ import com.verygood.island.constant.Constants;
 import com.verygood.island.entity.Letter;
 import com.verygood.island.entity.Stamp;
 import com.verygood.island.entity.User;
+import com.verygood.island.entity.vo.LetterVo;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.LetterMapper;
 import com.verygood.island.mapper.StampMapper;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -214,12 +217,22 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
 
     @Override
-    public List<Letter> getOneFriendLetter(Integer friendId, Integer userId) {
+    public List<LetterVo> getOneFriendLetter(Integer friendId, Integer userId) {
         //得到互送的信件
         log.info("正在执行信件查询letter: friendId = {} userId = {}", friendId, userId);
         QueryWrapper<Letter> queryWrapper = new QueryWrapper<Letter>().eq("sender_id", friendId).eq("receiver_id", userId)
                 .or().eq("receiver_id", friendId).eq("sender_id", userId);
-        return super.list(queryWrapper);
+
+       List<Letter> letters=super.list(queryWrapper);
+       List<LetterVo> letterVos=new ArrayList<>(letters.size());
+        for (Letter letter : letters) {
+            LetterVo letterVo = new LetterVo();
+            letterVo.setLetter(letter);
+            letterVo.setNickname(userMapper.getNicknameByUserId(letterVo.getLetter().getSenderId()));
+            letterVo.setStampName(stampMapper.getStampNameByStampId(letterVo.getLetter().getStampId()));
+            letterVos.add(letterVo);
+        }
+       return letterVos;
     }
 
     /**

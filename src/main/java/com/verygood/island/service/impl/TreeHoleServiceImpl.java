@@ -54,7 +54,7 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
         log.info("正在查询treeHole中id为{}的数据", id);
         TreeHole treeHole = super.getById(id);
         TreeHoleVo treeHoleVo=new TreeHoleVo();
-        BeanUtil.copyProperties(treeHole,treeHoleVo);
+        treeHoleVo.setHole(treeHole);
         Map<String,Object> map=new HashMap<>();
         map.put("tree_hole_id",id);
         treeHoleVo.setMessages(messageMapper.selectByMap(map));
