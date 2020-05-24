@@ -3,6 +3,7 @@ package com.verygood.island.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.constant.Constants;
@@ -55,15 +56,27 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
 
 
     @Override
-    public Page<Letter> listLettersByPage(int page, int pageSize, Integer friendId, Integer userId) {
+    public Page<LetterVo> listLettersByPage(int page, int pageSize, Integer friendId, Integer userId) {
         log.info("正在执行分页查询letter: page = {} pageSize = {} friendId = {} userId = {}", page, pageSize, friendId, userId);
         QueryWrapper<Letter> queryWrapper = new QueryWrapper<>();
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
         queryWrapper.eq("sender_id", friendId).eq("receiver_id", userId)
                 .or().eq("receiver_id", friendId).eq("sender_id", userId);
         Page<Letter> result = super.page(new Page<>(page, pageSize), queryWrapper);
-        log.info("分页查询letter完毕: 结果数 = {} ", result.getRecords().size());
-        return result;
+        //转vo
+        Page<LetterVo> voPage=new Page<>();
+        List<LetterVo> voList=new ArrayList<>(voPage.getRecords().size());
+        for(Letter letter:result.getRecords()){
+            LetterVo letterVo=new LetterVo();
+            letterVo.setLetter(letter);
+            letterVo.setStampName(stampMapper.getStampNameByStampId(letter.getStampId()));
+            letterVo.setNickname(userMapper.getNicknameByUserId(letter.getSenderId()));
+            voList.add(letterVo);
+        }
+        BeanUtil.copyProperties(result,voPage);
+        voPage.setRecords(voList);
+        log.info("分页查询letter完毕: 结果数 = {} ", voPage.getRecords().size());
+        return voPage;
     }
 
     @Override
@@ -224,6 +237,10 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
                 .or().eq("receiver_id", friendId).eq("sender_id", userId);
 
        List<Letter> letters=super.list(queryWrapper);
+       //判空
+       if(letters==null){
+           throw new BizException("没有互送信件");
+       }
        List<LetterVo> letterVos=new ArrayList<>(letters.size());
         for (Letter letter : letters) {
             LetterVo letterVo = new LetterVo();
