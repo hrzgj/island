@@ -33,9 +33,8 @@ public class TreeHoleController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
-                                    @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-                                    @RequestParam(name = "factor", defaultValue = "") String factor) {
-        return new ResultBean<>(treeHoleService.listTreeHolesByPage(page, pageSize, factor));
+                                    @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
+        return new ResultBean<>(treeHoleService.listTreeHolesByPage(page, pageSize));
     }
 
 
@@ -84,4 +83,17 @@ public class TreeHoleController {
         treeHole.setCreatorId(user.getUserId());
         return new ResultBean<>(treeHoleService.updateTreeHole(treeHole));
     }
+
+    /**
+     * 根据用户id查询
+     */
+    @RequestMapping(method = RequestMethod.GET,value = "/me")
+    public ResultBean<?> getByUserId() {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(treeHoleService.getByUserId(user.getUserId()));
+    }
+
 }
