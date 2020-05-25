@@ -65,4 +65,12 @@ public class PostController {
     public ResultBean<?> updateById(@RequestBody Post post) {
         return new ResultBean<>(postService.updatePost(post));
     }
+
+    /**
+     * 根据海岛id查询
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/all/{id}")
+    public ResultBean<?> getByUserId(@PathVariable("id") Integer id) {
+        return new ResultBean<>(postService.getByUserId(id));
+    }
 }

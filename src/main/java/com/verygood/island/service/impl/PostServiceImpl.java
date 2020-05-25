@@ -10,6 +10,10 @@ import com.verygood.island.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * <p>
  * 海岛动态 服务实现类
@@ -80,6 +84,23 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
             log.error("更新id为{}的post失败", post.getPostId());
             throw new BizException("更新失败[id=" + post.getPostId() + "]");
         }
+    }
+
+    @Override
+    public List<Post> getByUserId(Integer id) {
+        log.info("正在查询userId为{}的post列表数据", id);
+        Map<String,Object> map=new HashMap<>();
+        map.put("user_id",id);
+        List<Post> posts=super.listByMap(map);
+        if(posts==null){
+            log.info("userId为{}的没有post",id);
+            return null;
+        }
+        for(Post post:posts){
+            post.setView(post.getView()+1);
+            super.updateById(post);
+        }
+        return posts;
     }
 
 }
