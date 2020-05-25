@@ -96,10 +96,6 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
             log.info("userId为{}的没有post",id);
             return null;
         }
-        for(Post post:posts){
-            post.setView(post.getView()+1);
-            super.updateById(post);
-        }
         return posts;
     }
 
