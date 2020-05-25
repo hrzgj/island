@@ -2,8 +2,12 @@ package com.verygood.island.controller;
 
 
 import com.verygood.island.entity.Star;
+import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.StarService;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,11 +48,15 @@ public class StarController {
     }
 
     /**
-     * 新增
+     * 根据id星标海岛
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Star star) {
-        return new ResultBean<>(starService.insertStar(star));
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(starService.insertStar(star, user.getUserId()));
     }
 
     /**
