@@ -3,6 +3,8 @@ package com.verygood.island.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.Post;
 
+import java.util.List;
+
 /**
  * <p>
  * 海岛动态 服务类
@@ -65,4 +67,14 @@ public interface PostService {
      */
     int updatePost(Post post);
 
+    /**
+     * 根据用户id得到post列表
+     * @name
+     * @param
+     * @return
+     * @notice none
+     * @author cy
+     * @date 2020/5/25
+     */
+    List<Post> getByUserId(Integer id);
 }
