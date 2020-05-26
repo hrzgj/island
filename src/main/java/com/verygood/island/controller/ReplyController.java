@@ -65,4 +65,12 @@ public class ReplyController {
     public ResultBean<?> updateById(@RequestBody Reply reply) {
         return new ResultBean<>(replyService.updateReply(reply));
     }
+
+    /**
+     * 根据postId查询
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/post/{id}")
+    public ResultBean<?> getByPostId(@PathVariable("id") Integer id) {
+        return new ResultBean<>(replyService.getByPostId(id));
+    }
 }
