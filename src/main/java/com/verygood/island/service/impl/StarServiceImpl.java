@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.entity.Star;
 import com.verygood.island.entity.User;
 import com.verygood.island.entity.vo.UserVo;
+import com.verygood.island.entity.User;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.StarMapper;
 import com.verygood.island.mapper.UserMapper;
@@ -14,6 +15,7 @@ import com.verygood.island.util.LocationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -74,8 +76,39 @@ public class StarServiceImpl extends ServiceImpl<StarMapper, Star> implements St
     }
 
     @Override
-    public int insertStar(Star star) {
+    public int insertStar(Star star, Integer userId) {
         log.info("正在插入star");
+
+        // 查询海岛id是否为空
+        if (star == null || star.getIslandId() == null){
+            log.info("插入star时参数不足");
+            throw new BizException("海岛ID不能为空！");
+        }
+
+        // 查看海岛是否存在
+        if (userMapper.selectCount(new QueryWrapper<User>()
+        .eq("user_id", star.getIslandId())) == 0){
+            log.info("星标海岛时id为【{}】的海岛不存在", star.getIslandId());
+            throw new BizException("星标的海岛不存在！");
+        }
+
+        // 查看是否星标的是自己的海岛
+        if (star.getIslandId().equals(userId)){
+            log.info("星标海岛时用户【{}】尝试星标自己的海岛", userId);
+            throw new BizException("不可以星标自己的海岛");
+        }
+
+        // 查看自己是否已经星标了该海岛
+        if (super.count(new QueryWrapper<Star>()
+        .eq("user_id", userId)
+        .eq("island_id", star.getIslandId())) > 0){
+            log.info("星标海岛时用户【{}】已星标了【{}】海岛", userId, star.getIslandId());
+            throw new BizException("您已经星标了该海岛");
+        }
+
+        // 进行星标操作
+        star.setUserId(userId);
+
         if (super.save(star)) {
             log.info("插入star成功,id为{}", star.getStarId());
             return star.getStarId();

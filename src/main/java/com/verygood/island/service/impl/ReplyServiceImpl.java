@@ -10,6 +10,10 @@ import com.verygood.island.service.ReplyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * <p>
  * 回复 服务实现类
@@ -74,6 +78,16 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements
             log.error("更新id为{}的reply失败", reply.getReplyId());
             throw new BizException("更新失败[id=" + reply.getReplyId() + "]");
         }
+    }
+
+    @Override
+    public List<Reply> getByPostId(Integer id) {
+        log.info("正在查询reply中postId为{}的数据", id);
+        Map<String,Object> map=new HashMap<>();
+        map.put("post_id",id);
+        List<Reply> reply=super.listByMap(map);
+        log.info("postId为{}查询reply完毕: 结果数 = {} ",id,reply.size() );
+        return reply;
     }
 
 }

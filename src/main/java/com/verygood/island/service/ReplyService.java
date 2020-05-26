@@ -3,6 +3,8 @@ package com.verygood.island.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.Reply;
 
+import java.util.List;
+
 /**
  * <p>
  * 回复 服务类
@@ -65,4 +67,12 @@ public interface ReplyService {
      */
     int updateReply(Reply reply);
 
+    /**
+     * 根据postId查询Reply
+     *
+     * @param id 需要查询的Reply的postId
+     * @author cy
+     * @since 2020-05-26
+     */
+    List<Reply> getByPostId(Integer id);
 }

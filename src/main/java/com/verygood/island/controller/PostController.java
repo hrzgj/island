@@ -2,8 +2,12 @@ package com.verygood.island.controller;
 
 
 import com.verygood.island.entity.Post;
+import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.PostService;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +51,11 @@ public class PostController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Post post) {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        post.setUserId(user.getUserId());
         return new ResultBean<>(postService.insertPost(post));
     }
 
@@ -64,5 +73,13 @@ public class PostController {
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody Post post) {
         return new ResultBean<>(postService.updatePost(post));
+    }
+
+    /**
+     * 根据海岛id查询
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/all/{id}")
+    public ResultBean<?> getByUserId(@PathVariable("id") Integer id) {
+        return new ResultBean<>(postService.getByUserId(id));
     }
 }

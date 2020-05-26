@@ -2,8 +2,12 @@ package com.verygood.island.controller;
 
 
 import com.verygood.island.entity.Reply;
+import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.ReplyService;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,5 +68,13 @@ public class ReplyController {
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody Reply reply) {
         return new ResultBean<>(replyService.updateReply(reply));
+    }
+
+    /**
+     * 根据postId查询
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/post/{id}")
+    public ResultBean<?> getByPostId(@PathVariable("id") Integer id) {
+        return new ResultBean<>(replyService.getByPostId(id));
     }
 }

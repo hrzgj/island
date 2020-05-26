@@ -52,11 +52,15 @@ public class StarController {
     }
 
     /**
-     * 新增
+     * 根据id星标海岛
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Star star) {
-        return new ResultBean<>(starService.insertStar(star));
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(starService.insertStar(star, user.getUserId()));
     }
 
     /**

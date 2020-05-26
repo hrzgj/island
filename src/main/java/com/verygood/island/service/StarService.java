@@ -42,11 +42,12 @@ public interface StarService {
      * 插入Star
      *
      * @param star 需要插入的Star对象
+     * @param userId 用户id
      * @return 返回插入成功之后Star对象的id
      * @author chaos
      * @since 2020-05-04
      */
-    int insertStar(Star star);
+    int insertStar(Star star, Integer userId);
 
     /**
      * 根据id删除Star
