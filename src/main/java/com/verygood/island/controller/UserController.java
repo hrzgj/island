@@ -104,12 +104,25 @@ public class UserController {
      * 上传头像
      */
     @RequestMapping(method = RequestMethod.POST, value = "/upload")
-    public ResultBean<?> login(@RequestParam MultipartFile file) {
+    public ResultBean<?> uploadIcon(@RequestParam MultipartFile file) {
         Subject subject = SecurityUtils.getSubject();
         User user = (User) subject.getPrincipal();
         if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         return new ResultBean<>(userService.uploadIcon(file, user.getUserId()));
+    }
+
+    /**
+     * 上传海岛背景
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/upload/background")
+    public ResultBean<?> uploadBackground(@RequestParam MultipartFile file) {
+        Subject subject = SecurityUtils.getSubject();
+        User user = (User) subject.getPrincipal();
+        if (user == null) {
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(userService.uploadBackground(file, user.getUserId()));
     }
 }
