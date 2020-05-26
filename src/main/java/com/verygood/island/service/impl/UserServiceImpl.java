@@ -271,26 +271,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public String uploadIcon(MultipartFile file, Integer userId) {
 
         log.info("正在执行上传用户头像操作");
-        if (file == null || file.getSize() == 0) {
-            log.info("上传的文件为空！");
-            throw new BizException("请选择正确的文件！");
-        }
 
-        // 对上传的文件进行判断
-        boolean isImage = false;
-        try {
-            isImage = ImageUtils.isImage(file.getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (!isImage) {
-            log.info("用户上传的文件不是图片：【{}】", file.getOriginalFilename());
-            throw new BizException("上传头像失败！该文件非图片类型");
-        }
-
-        log.info("上传的文件名称：【{}】", file.getOriginalFilename());
-        File result = UploadUtils.upload(file, UploadUtils.getFileName(file.getOriginalFilename()));
+        File result = checkAndUploadFile(file);
 
         // 进行数据库的更新
         User userPo = getOne(new QueryWrapper<User>().eq("user_id", userId));
@@ -306,6 +288,56 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         updateById(userPo);
 
         return result.getName();
+    }
+
+    @Override
+    public String uploadBackground(MultipartFile file, Integer userId) {
+        log.info("正在执行上传用户海岛背景操作");
+
+        File result = checkAndUploadFile(file);
+
+        // 进行数据库的更新
+        User userPo = getOne(new QueryWrapper<User>().eq("user_id", userId));
+
+        // 删除旧的背景地址
+        if (!StringUtils.isEmpty(userPo.getBackground())) {
+            UploadUtils.deleteFile(userPo.getBackground());
+        }
+
+        // 设置图片地址
+        userPo.setBackground(result.getName());
+
+        updateById(userPo);
+
+        return result.getName();
+    }
+
+    /**
+     * 检查文件格式并且上传到服务器
+     * @param file 文件内容
+     * @return 上传后的文件
+     */
+    private File checkAndUploadFile(MultipartFile file){
+        if (file == null || file.getSize() == 0) {
+            log.info("上传的文件为空！");
+            throw new BizException("请选择正确的文件！");
+        }
+
+        // 对上传的文件进行判断
+        boolean isImage = false;
+        try {
+            isImage = ImageUtils.isImage(file.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (!isImage) {
+            log.info("用户上传的文件不是图片：【{}】", file.getOriginalFilename());
+            throw new BizException("上传海岛背景失败！该文件非图片类型");
+        }
+
+        log.info("上传的文件名称：【{}】", file.getOriginalFilename());
+        return UploadUtils.upload(file, UploadUtils.getFileName(file.getOriginalFilename()));
     }
 
     @Scheduled(cron = "0 15 * * * ?")
