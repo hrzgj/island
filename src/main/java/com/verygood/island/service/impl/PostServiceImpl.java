@@ -10,6 +10,7 @@ import com.verygood.island.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,8 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     @Override
     public int insertPost(Post post) {
         log.info("正在插入post");
+        post.setView(0);
+        post.setTime(LocalDateTime.now());
         if (super.save(post)) {
             log.info("插入post成功,id为{}", post.getPostId());
             return post.getPostId();
