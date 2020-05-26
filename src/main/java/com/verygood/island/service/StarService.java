@@ -2,6 +2,7 @@ package com.verygood.island.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.Star;
+import com.verygood.island.entity.vo.UserVo;
 
 /**
  * <p>
@@ -24,7 +25,8 @@ public interface StarService {
      * @author chaos
      * @since 2020-05-04
      */
-    Page<Star> listStarsByPage(int page, int pageSize, String factor);
+    Page<UserVo> listStarsByPage(int page, int pageSize, String factor, Integer userId);
+
 
     /**
      * 根据id查询Star

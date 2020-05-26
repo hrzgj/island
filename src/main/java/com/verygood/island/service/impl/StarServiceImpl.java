@@ -4,11 +4,21 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.entity.Star;
+import com.verygood.island.entity.User;
+import com.verygood.island.entity.vo.UserVo;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.StarMapper;
+import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.StarService;
+import com.verygood.island.util.LocationUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <p>
@@ -23,14 +33,36 @@ import org.springframework.stereotype.Service;
 @Service
 public class StarServiceImpl extends ServiceImpl<StarMapper, Star> implements StarService {
 
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private LocationUtils locationUtils;
+
     @Override
-    public Page<Star> listStarsByPage(int page, int pageSize, String factor) {
+    public Page<UserVo> listStarsByPage(int page, int pageSize, String factor, Integer userId) {
         log.info("正在执行分页查询star: page = {} pageSize = {} factor = {}", page, pageSize, factor);
-        QueryWrapper<Star> queryWrapper = new QueryWrapper<Star>().like("", factor);
-        //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
-        Page<Star> result = super.page(new Page<>(page, pageSize));
+        QueryWrapper<Star> queryWrapper = new QueryWrapper<Star>().eq("user_id", userId);
+        Page<Star> result = super.page(new Page<>(page, pageSize), queryWrapper);
         log.info("分页查询star完毕: 结果数 = {} ", result.getRecords().size());
-        return result;
+
+        log.info("正在查询star对应的user");
+
+        List<UserVo> userVoList = new LinkedList<>();
+        for (Star star : result.getRecords()) {
+            User user = userMapper.selectById(star.getIslandId());
+            // 查看自己的信息
+            User self = (User) SecurityUtils.getSubject().getPrincipal();
+            //转成vo
+            UserVo userVo = new UserVo();
+            BeanUtils.copyProperties(user, userVo);
+            userVo.setDistance(locationUtils.getDistance(user.getCity(), self.getCity()));
+            userVoList.add(userVo);
+        }
+        Page<UserVo> userVoPage = new Page<>();
+        BeanUtils.copyProperties(result, userVoPage);
+        userVoPage.setRecords(userVoList);
+        return userVoPage;
     }
 
     @Override
