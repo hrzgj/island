@@ -83,10 +83,10 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements
     @Override
     public List<Reply> getByPostId(Integer id) {
         log.info("正在查询reply中postId为{}的数据", id);
-        Map<String,Object> map=new HashMap<>();
-        map.put("post_id",id);
-        List<Reply> reply=super.listByMap(map);
-        log.info("postId为{}查询reply完毕: 结果数 = {} ",id,reply.size() );
+        Map<String, Object> map = new HashMap<>();
+        map.put("post_id", id);
+        List<Reply> reply = super.listByMap(map);
+        log.info("postId为{}查询reply完毕: 结果数 = {} ", id, reply.size());
         return reply;
     }
 

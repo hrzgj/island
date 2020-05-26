@@ -54,7 +54,7 @@ public class ShiroRealm extends AuthorizingRealm {
         if (token instanceof UserToken) {
             try {
                 UserToken userToken = (UserToken) token;
-                if (null==userToken.getPassword()) {
+                if (null == userToken.getPassword()) {
                     throw new BizException("登录失败!请输入正确的密码！");
                 }
                 User loginUser = new User();

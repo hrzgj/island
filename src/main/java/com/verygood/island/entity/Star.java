@@ -12,7 +12,7 @@ import java.io.Serializable;
 /**
  * <p>
  * 星标
-
+ *
  * </p>
  *
  * @author chaos

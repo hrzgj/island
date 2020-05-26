@@ -103,7 +103,8 @@ public interface UserService {
 
     /**
      * 上传用户的海岛背景
-     * @param file 背景文件
+     *
+     * @param file   背景文件
      * @param userId 用户id
      * @return 文件位置
      */

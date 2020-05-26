@@ -41,12 +41,12 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     public Post getPostById(int id) {
         log.info("正在查询post中id为{}的数据", id);
         Post post = super.getById(id);
-        if(post==null){
-            log.info("没有id为{}的post",id);
+        if (post == null) {
+            log.info("没有id为{}的post", id);
             throw new BizException("没有该动态");
         }
         log.info("查询id为{}的post{}", id, "成功");
-        post.setView(post.getView()+1);
+        post.setView(post.getView() + 1);
         super.updateById(post);
         return post;
     }
@@ -92,11 +92,11 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     @Override
     public List<Post> getByUserId(Integer id) {
         log.info("正在查询userId为{}的post列表数据", id);
-        Map<String,Object> map=new HashMap<>();
-        map.put("user_id",id);
-        List<Post> posts=super.listByMap(map);
-        if(posts==null){
-            log.info("userId为{}的没有post",id);
+        Map<String, Object> map = new HashMap<>();
+        map.put("user_id", id);
+        List<Post> posts = super.listByMap(map);
+        if (posts == null) {
+            log.info("userId为{}的没有post", id);
             return null;
         }
         return posts;

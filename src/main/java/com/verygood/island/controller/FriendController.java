@@ -33,11 +33,11 @@ public class FriendController {
     @RequestMapping(method = RequestMethod.GET)
     public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
                                     @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
-        User user= (User) SecurityUtils.getSubject().getPrincipal();
-        if(user==null){
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
-        return new ResultBean<>(friendService.listFriendsByPage(page, pageSize,user.getUserId()));
+        return new ResultBean<>(friendService.listFriendsByPage(page, pageSize, user.getUserId()));
     }
 
 
@@ -74,14 +74,13 @@ public class FriendController {
     }
 
 
-
     /*
      *获得所有好友
      */
-    @RequestMapping(method = RequestMethod.GET,value = "/all")
+    @RequestMapping(method = RequestMethod.GET, value = "/all")
     public ResultBean<?> getUserFriend() {
-        User user= (User) SecurityUtils.getSubject().getPrincipal();
-        if(user==null){
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         return new ResultBean<>(friendService.getUserFriend(user.getUserId()));

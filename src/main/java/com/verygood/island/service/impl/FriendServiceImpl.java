@@ -14,7 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -35,27 +38,27 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
     private UserMapper userMapper;
 
     @Override
-    public Page<User> listFriendsByPage(int page, int pageSize,Integer userId) {
+    public Page<User> listFriendsByPage(int page, int pageSize, Integer userId) {
         log.info("正在执行分页查询friend: page = {} pageSize = {} ", page, pageSize);
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
-        queryWrapper.eq("user_id",userId);
-        Page<Friend> result = super.page(new Page<>(page, pageSize),queryWrapper);
-        if(result==null){
-            log.info("该userId={}没有笔友",userId);
+        queryWrapper.eq("user_id", userId);
+        Page<Friend> result = super.page(new Page<>(page, pageSize), queryWrapper);
+        if (result == null) {
+            log.info("该userId={}没有笔友", userId);
             return null;
         }
-        List<User> users=new ArrayList<>(result.getRecords().size());
-        log.info("userId{}笔友数量{}",userId,result.getRecords().size());
-        for(Friend friend:result.getRecords()){
-            QueryWrapper<User> userQueryWrapper=new QueryWrapper<User>().eq("user_id",friend.getFriendUserId());
-            User user=userMapper.selectOne(userQueryWrapper);
+        List<User> users = new ArrayList<>(result.getRecords().size());
+        log.info("userId{}笔友数量{}", userId, result.getRecords().size());
+        for (Friend friend : result.getRecords()) {
+            QueryWrapper<User> userQueryWrapper = new QueryWrapper<User>().eq("user_id", friend.getFriendUserId());
+            User user = userMapper.selectOne(userQueryWrapper);
             user.setPassword(null);
             users.add(user);
         }
         log.info("分页查询friend完毕: 结果数 = {} ", result.getRecords().size());
-        Page<User> userPage= new Page<>();
-        BeanUtil.copyProperties(result,userPage);
+        Page<User> userPage = new Page<>();
+        BeanUtil.copyProperties(result, userPage);
         userPage.setRecords(users);
         return userPage;
     }
@@ -106,19 +109,19 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
 
     @Override
     public List<User> getUserFriend(Integer userId) {
-        log.info("正在查询用户id为{}的所有笔友",userId);
-        Map<String,Object> columnMap=new HashMap<>(1);
-        columnMap.put("user_id",userId);
-        List<Friend> friends= friendMapper.selectByMap(columnMap);
-        if(friends.size()<=0){
-            log.info("用户id为{}的所有笔友为空",userId);
+        log.info("正在查询用户id为{}的所有笔友", userId);
+        Map<String, Object> columnMap = new HashMap<>(1);
+        columnMap.put("user_id", userId);
+        List<Friend> friends = friendMapper.selectByMap(columnMap);
+        if (friends.size() <= 0) {
+            log.info("用户id为{}的所有笔友为空", userId);
             return null;
         }
-        List<User> users=new ArrayList<>(friends.size());
-        log.info("userId{}笔友数量{}",userId,friends.size());
-        for(Friend friend:friends){
-            QueryWrapper<User> userQueryWrapper=new QueryWrapper<User>().eq("user_id",friend.getFriendUserId());
-            User user=userMapper.selectOne(userQueryWrapper);
+        List<User> users = new ArrayList<>(friends.size());
+        log.info("userId{}笔友数量{}", userId, friends.size());
+        for (Friend friend : friends) {
+            QueryWrapper<User> userQueryWrapper = new QueryWrapper<User>().eq("user_id", friend.getFriendUserId());
+            User user = userMapper.selectOne(userQueryWrapper);
             user.setPassword(null);
             users.add(user);
         }

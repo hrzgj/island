@@ -10,7 +10,6 @@ import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
@@ -22,6 +21,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * 缓存配置-使用Lettuce客户端，自动注入配置的方式
+ *
  * @author huange7
  */
 @org.springframework.context.annotation.Configuration
@@ -108,21 +108,6 @@ public class RedisConfig extends CachingConfigurerSupport {
 
         return template;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

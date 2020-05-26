@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class TreeHoleVo  {
+public class TreeHoleVo {
 
 
     private TreeHole hole;

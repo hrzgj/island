@@ -35,7 +35,11 @@ public class StarController {
     public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
                                     @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
                                     @RequestParam(name = "factor", defaultValue = "") String factor) {
-        return new ResultBean<>(starService.listStarsByPage(page, pageSize, factor));
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (null == user) {
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(starService.listStarsByPage(page, pageSize, factor, user.getUserId()));
     }
 
 
@@ -53,7 +57,7 @@ public class StarController {
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Star star) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
-        if (user == null){
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         return new ResultBean<>(starService.insertStar(star, user.getUserId()));

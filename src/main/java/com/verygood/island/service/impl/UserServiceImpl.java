@@ -11,7 +11,10 @@ import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.StampService;
 import com.verygood.island.service.UserService;
-import com.verygood.island.util.*;
+import com.verygood.island.util.ImageUtils;
+import com.verygood.island.util.LocationUtils;
+import com.verygood.island.util.Md5Util;
+import com.verygood.island.util.UploadUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.BeanUtils;
@@ -45,9 +48,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     StampService stampService;
-
-    @Resource
-    RedisUtils redisUtils;
 
 
     List<User> users = null;
@@ -314,10 +314,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 检查文件格式并且上传到服务器
+     *
      * @param file 文件内容
      * @return 上传后的文件
      */
-    private File checkAndUploadFile(MultipartFile file){
+    private File checkAndUploadFile(MultipartFile file) {
         if (file == null || file.getSize() == 0) {
             log.info("上传的文件为空！");
             throw new BizException("请选择正确的文件！");

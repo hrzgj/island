@@ -77,10 +77,11 @@ public interface LetterService {
      * @author cy
      * @since 2020-05-04
      */
-    List<LetterVo> getOneFriendLetter(Integer senderId,Integer receiverId);
+    List<LetterVo> getOneFriendLetter(Integer senderId, Integer receiverId);
 
     /**
      * 获取用户的草稿列表
+     *
      * @param userId 用户id
      * @return : java.util.List<com.verygood.island.entity.Letter>
      * @author : huange7
@@ -90,6 +91,7 @@ public interface LetterService {
 
     /**
      * 发送时间胶囊
+     *
      * @param letter 信件实体类
      * @param userId 发送者id
      * @return

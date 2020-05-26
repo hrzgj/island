@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 
 @Log4j2
-public class CustomDefaultWebSessionManager extends DefaultWebSessionManager{
+public class CustomDefaultWebSessionManager extends DefaultWebSessionManager {
 
     @Override
     protected Serializable getSessionId(ServletRequest request, ServletResponse response) {
@@ -34,7 +34,7 @@ public class CustomDefaultWebSessionManager extends DefaultWebSessionManager{
 
 
     @Override
-    protected void onStart(Session session, SessionContext context){
+    protected void onStart(Session session, SessionContext context) {
         super.onStart(session, context);
 
         if (!WebUtils.isHttp(context)) {
@@ -44,9 +44,8 @@ public class CustomDefaultWebSessionManager extends DefaultWebSessionManager{
 
         }
         HttpServletResponse response = WebUtils.getHttpResponse(context);
-        response.setHeader("Authorization",session.getId().toString());
+        response.setHeader("Authorization", session.getId().toString());
     }
-
 
 
 }
