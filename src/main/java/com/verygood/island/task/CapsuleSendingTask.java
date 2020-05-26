@@ -70,10 +70,11 @@ public class CapsuleSendingTask implements Runnable {
 
     /**
      * 时间转换工具
+     *
      * @param time 将时间转换为中文格式
      * @return 字符串
      */
-    private String transferDate(LocalDateTime time){
+    private String transferDate(LocalDateTime time) {
         return time.getYear() + "年" +
                 time.getMonth().getValue() + "月" +
                 time.getDayOfMonth() + "日";

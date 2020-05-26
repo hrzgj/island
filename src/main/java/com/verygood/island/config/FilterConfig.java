@@ -4,7 +4,6 @@ package com.verygood.island.config;
 import com.verygood.island.controller.filter.ExceptionHandlerFilter;
 import com.verygood.island.controller.filter.ParamsFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

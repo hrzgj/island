@@ -126,7 +126,7 @@ public class LocationUtils {
      * @date 2020-05-07
      */
     private Map<String, List<Map<String, String>>> getResult(String url, Map<String, String> params) {
-        String formattedUrl = formatUrlParamsByMap(url,params);
+        String formattedUrl = formatUrlParamsByMap(url, params);
         log.info("正在请求外部api\nconnecting... {}", formattedUrl);
 
         HttpHeaders headers = new HttpHeaders();
@@ -171,7 +171,7 @@ public class LocationUtils {
      * @param map
      * @return 返回添加参数的url
      */
-    public static String formatUrlParamsByMap(String url,Map<String, String> map) {
+    public static String formatUrlParamsByMap(String url, Map<String, String> map) {
         if (map == null) {
             return "";
         }

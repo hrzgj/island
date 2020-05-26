@@ -5,12 +5,14 @@ import java.security.MessageDigest;
 
 /**
  * 进行密码加密
+ *
  * @author 黄钰朝
  */
 public class Md5Util {
 
     /**
      * 对字符串进行MD5加密
+     *
      * @param str 一般为用户密码
      * @return : java.lang.String
      * @author : huange7

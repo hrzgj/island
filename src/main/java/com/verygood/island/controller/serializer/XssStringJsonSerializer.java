@@ -1,9 +1,12 @@
 package com.verygood.island.controller.serializer;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.apache.commons.text.StringEscapeUtils;
+
 import java.io.IOException;
+
 /**
  * @author <a href="mailto:kobe524348@gmail.com">黄钰朝</a>
  * @description json序列化
@@ -15,6 +18,7 @@ public class XssStringJsonSerializer extends JsonSerializer<String> {
     public Class<String> handledType() {
         return String.class;
     }
+
     @Override
     public void serialize(String value, JsonGenerator jsonGenerator,
                           SerializerProvider serializerProvider) throws IOException {

@@ -1,6 +1,5 @@
 package com.verygood.island.util;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -21,7 +20,7 @@ public class BeanUtils {
     /**
      * 定义一个获取已经实例化bean的方法
      */
-    public static <T> T getBean(Class<T> c){
+    public static <T> T getBean(Class<T> c) {
         return applicationContext.getBean(c);
     }
 

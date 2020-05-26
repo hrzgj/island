@@ -314,10 +314,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 检查文件格式并且上传到服务器
+     *
      * @param file 文件内容
      * @return 上传后的文件
      */
-    private File checkAndUploadFile(MultipartFile file){
+    private File checkAndUploadFile(MultipartFile file) {
         if (file == null || file.getSize() == 0) {
             log.info("上传的文件为空！");
             throw new BizException("请选择正确的文件！");
