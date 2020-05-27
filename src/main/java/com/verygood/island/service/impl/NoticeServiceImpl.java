@@ -1,7 +1,6 @@
 package com.verygood.island.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.entity.Notice;
 import com.verygood.island.exception.bizException.BizException;
@@ -25,12 +24,12 @@ import java.util.List;
 public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> implements NoticeService {
 
     @Override
-    public List<Notice> listNoticesByPage(Integer userId){
-        log.info("正在返回userId={}的通知",userId);
-        QueryWrapper<Notice> queryWrapper = new QueryWrapper<Notice>().eq("user_id",userId).eq("is_read",0);
+    public List<Notice> listNoticesByPage(Integer userId) {
+        log.info("正在返回userId={}的通知", userId);
+        QueryWrapper<Notice> queryWrapper = new QueryWrapper<Notice>().eq("user_id", userId).eq("is_read", 0);
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
-        List<Notice> notices=super.list(queryWrapper);
-        log.info("返回通知数量{}",notices.size());
+        List<Notice> notices = super.list(queryWrapper);
+        log.info("返回通知数量{}", notices.size());
         return notices;
     }
 
@@ -81,7 +80,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
     @Override
     public int readNoticeById(Integer userId, Integer noticeId) {
         log.info("正在更新id为{}的notice的读取状态", noticeId);
-        if (noticeId == null){
+        if (noticeId == null) {
             log.info("id为空，无法进行更新读状态");
             throw new BizException("更新消息状态失败！请校验参数");
         }
@@ -89,13 +88,13 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
         // 查询对应的notice记录
         Notice notice = getById(noticeId);
 
-        if (notice == null){
+        if (notice == null) {
             log.info("查询id为【{}】的notice，notice不存在！", noticeId);
             throw new BizException("更新消息状态失败！不存在该消息");
         }
 
         // 设置为已读状态
-        if (notice.getIsRead()){
+        if (notice.getIsRead()) {
             log.info("更新id为【{}】的notice读状态失败！已经被读", noticeId);
             throw new BizException("该条消息已经被读，不可重复读取");
         }

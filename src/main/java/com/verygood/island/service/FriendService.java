@@ -25,7 +25,7 @@ public interface FriendService {
      * @author chaos
      * @since 2020-05-04
      */
-    Page<User> listFriendsByPage(int page, int pageSize,Integer userId);
+    Page<User> listFriendsByPage(int page, int pageSize, Integer userId);
 
     /**
      * 根据id查询Friend
@@ -71,6 +71,6 @@ public interface FriendService {
     /*
      *不分页查询friend
      */
-    List<User>getUserFriend(Integer userId);
+    List<User> getUserFriend(Integer userId);
 
 }

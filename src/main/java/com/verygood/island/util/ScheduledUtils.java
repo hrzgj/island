@@ -1,11 +1,5 @@
 package com.verygood.island.util;
 
-import cn.hutool.json.JSONUtil;
-import com.verygood.island.entity.Letter;
-import com.verygood.island.entity.Notice;
-import com.verygood.island.exception.bizException.BizException;
-import com.verygood.island.service.LetterService;
-import com.verygood.island.task.CapsuleSendingTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.temporal.TemporalField;
 
 /**
  * @ClassName ScheduledUtils
@@ -24,7 +17,7 @@ import java.time.temporal.TemporalField;
  */
 @Component
 @Slf4j
-public class ScheduledUtils{
+public class ScheduledUtils {
 
     @Autowired
     private RedisUtils redisUtils;
@@ -39,25 +32,26 @@ public class ScheduledUtils{
     @Scheduled(fixedDelay = 100)
     public void checkAndSend() {
         Object runnable = redisUtils.range(KEY, 0, 0);
-        if (runnable == null){
+        if (runnable == null) {
             return;
         }
         Double score = redisUtils.score(KEY, runnable);
-        if (score <= LocalDateTime.now().toEpochSecond(ZoneOffset.of(ZONE_OFFSET))){
+        if (score <= LocalDateTime.now().toEpochSecond(ZoneOffset.of(ZONE_OFFSET))) {
             // 移除对应的score
             redisUtils.remove(KEY, runnable);
             // 时间到,可以执行定时任务
-            ((Runnable)runnable).run();
+            ((Runnable) runnable).run();
         }
     }
 
     /**
      * 添加定时任务
+     *
      * @param startTime 开始执行时间
-     * @param runnable 对应的runnable
+     * @param runnable  对应的runnable
      * @return boolean
      */
-    public boolean addTask(LocalDateTime startTime, Runnable runnable){
+    public boolean addTask(LocalDateTime startTime, Runnable runnable) {
         return redisUtils.add(KEY, runnable, startTime.toEpochSecond(ZoneOffset.of(ZONE_OFFSET)));
     }
 }

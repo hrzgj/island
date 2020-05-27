@@ -1,6 +1,5 @@
 package com.verygood.island.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.Notice;
 
 import java.util.List;
@@ -66,7 +65,8 @@ public interface NoticeService {
 
     /**
      * 根据用户id和消息id更新消息的读状态
-     * @param userId 用户id
+     *
+     * @param userId   用户id
      * @param noticeId 消息id
      * @return : int
      * @author : huange7

@@ -32,8 +32,8 @@ public class NoticeController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ResultBean<?> listByPage() {
-        User user= (User) SecurityUtils.getSubject().getPrincipal();
-        if(user==null){
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         return new ResultBean<>(noticeService.listNoticesByPage(user.getUserId()));
@@ -73,12 +73,12 @@ public class NoticeController {
     }
 
     /**
-     *  更改消息读状态
+     * 更改消息读状态
      */
     @RequestMapping(method = RequestMethod.PUT, value = "/read/{id}")
-    public ResultBean<?> readById(@PathVariable("id") Integer id){
-        User user = (User)SecurityUtils.getSubject().getPrincipal();
-        if (user == null){
+    public ResultBean<?> readById(@PathVariable("id") Integer id) {
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
             return new ResultBean<>(BizExceptionCodeEnum.NO_LOGIN);
         }
         return new ResultBean<>(noticeService.readNoticeById(user.getUserId(), id));

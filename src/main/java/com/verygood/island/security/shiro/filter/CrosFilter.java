@@ -17,7 +17,7 @@ import java.io.IOException;
 public class CrosFilter extends FormAuthenticationFilter {
 
 
-	//解决OPTIONS请求跨域问题
+    //解决OPTIONS请求跨域问题
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         if (request instanceof HttpServletRequest) {
@@ -37,7 +37,7 @@ public class CrosFilter extends FormAuthenticationFilter {
             httpResponse.setHeader("Access-Control-Allow-Methods", httpRequest.getMethod());
             httpResponse.setHeader("Access-Control-Allow-Headers", httpRequest.getHeader("Access-Control-Request-Headers"));
             httpResponse.addHeader("Access-Control-Allow-Headers", "Content-Type,token,Authorization");
-            httpResponse.addHeader("Access-Control-Expose-Headers","Content-Type,token,Authorization");
+            httpResponse.addHeader("Access-Control-Expose-Headers", "Content-Type,token,Authorization");
             httpResponse.setStatus(HttpStatus.OK.value());
             return false;
         }
@@ -49,21 +49,21 @@ public class CrosFilter extends FormAuthenticationFilter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         if (isAjax(request)) {
             setResponse(httpServletResponse);
-        }else {
+        } else {
             setResponse(httpServletResponse);
         }
         return false;
     }
 
-    private boolean isAjax(ServletRequest request){
+    private boolean isAjax(ServletRequest request) {
         String header = ((HttpServletRequest) request).getHeader("X-Requested-With");
-        if("XMLHttpRequest".equalsIgnoreCase(header)){
+        if ("XMLHttpRequest".equalsIgnoreCase(header)) {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
     }
 
-    public static void setResponse(HttpServletResponse response){
+    public static void setResponse(HttpServletResponse response) {
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -77,7 +77,6 @@ public class CrosFilter extends FormAuthenticationFilter {
             e.printStackTrace();
         }
     }
-
 
 
 }

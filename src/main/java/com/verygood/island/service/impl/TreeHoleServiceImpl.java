@@ -10,7 +10,6 @@ import com.verygood.island.mapper.MessageMapper;
 import com.verygood.island.mapper.TreeHoleMapper;
 import com.verygood.island.service.TreeHoleService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -42,9 +41,9 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     public Page<TreeHole> listTreeHolesByPage(int page, int pageSize) {
         log.info("正在执行分页查询treeHole: page = {} pageSize = {} ", page, pageSize);
         //TODO 这里需要自定义用于匹配的字段,并把wrapper传入下面的page方法
-        QueryWrapper<TreeHole> queryWrapper=new QueryWrapper<>();
+        QueryWrapper<TreeHole> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("create_time");
-        Page<TreeHole> result = super.page(new Page<>(page, pageSize),queryWrapper);
+        Page<TreeHole> result = super.page(new Page<>(page, pageSize), queryWrapper);
         log.info("分页查询treeHole完毕: 结果数 = {} ", result.getRecords().size());
         return result;
     }
@@ -53,13 +52,13 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     public TreeHoleVo getTreeHoleById(int id) {
         log.info("正在查询treeHole中id为{}的数据", id);
         TreeHole treeHole = super.getById(id);
-        if(treeHole==null){
+        if (treeHole == null) {
             return null;
         }
-        TreeHoleVo treeHoleVo=new TreeHoleVo();
+        TreeHoleVo treeHoleVo = new TreeHoleVo();
         treeHoleVo.setHole(treeHole);
-        Map<String,Object> map=new HashMap<>();
-        map.put("tree_hole_id",id);
+        Map<String, Object> map = new HashMap<>();
+        map.put("tree_hole_id", id);
         treeHoleVo.setMessages(messageMapper.selectByMap(map));
         log.info("查询id为{}的treeHole{}", id, (null == treeHole ? "无结果" : "成功"));
         return treeHoleVo;
@@ -69,8 +68,8 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     public int insertTreeHole(TreeHole treeHole) {
         log.info("正在插入treeHole");
         treeHole.setCreateTime(LocalDateTime.now());
-        Integer userTreeNumber=treeHoleMapper.getUserTreeNumber(treeHole.getCreatorId());
-        if(userTreeNumber>=5){
+        Integer userTreeNumber = treeHoleMapper.getUserTreeNumber(treeHole.getCreatorId());
+        if (userTreeNumber >= 5) {
             log.error("插入treeHole失败，用户树洞超过五个");
             throw new BizException("用户树洞已有5个，无法添加");
         }
@@ -84,10 +83,10 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     }
 
     @Override
-    public int deleteTreeHoleById(int id,Integer userId) {
+    public int deleteTreeHoleById(int id, Integer userId) {
         log.info("正在删除id为{}的treeHole", id);
-        if(!userId.equals(treeHoleMapper.getUserIdByTreeId(id))){
-            log.error("更新id为{}的treeHole失败,登录用户与树洞拥有用户不同",id);
+        if (!userId.equals(treeHoleMapper.getUserIdByTreeId(id))) {
+            log.error("更新id为{}的treeHole失败,登录用户与树洞拥有用户不同", id);
             throw new BizException("登录用户与树洞拥有用户不同");
         }
         if (super.removeById(id)) {
@@ -102,8 +101,8 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
     @Override
     public int updateTreeHole(TreeHole treeHole) {
         log.info("正在更新id为{}的treeHole", treeHole.getTreeHoleId());
-        Integer userId=treeHoleMapper.getUserIdByTreeId(treeHole.getTreeHoleId());
-        if(!userId.equals(treeHole.getCreatorId())){
+        Integer userId = treeHoleMapper.getUserIdByTreeId(treeHole.getTreeHoleId());
+        if (!userId.equals(treeHole.getCreatorId())) {
             log.error("更新id为{}的treeHole失败,登录用户与树洞拥有用户不同", treeHole.getTreeHoleId());
             throw new BizException("登录用户与树洞拥有用户不同");
         }
@@ -118,9 +117,9 @@ public class TreeHoleServiceImpl extends ServiceImpl<TreeHoleMapper, TreeHole> i
 
     @Override
     public List<TreeHole> getByUserId(Integer userId) {
-        log.info("正在查询用户id为{}的树洞",userId);
-        Map<String, Object> map=new HashMap<>();
-        map.put("creator_id",userId);
+        log.info("正在查询用户id为{}的树洞", userId);
+        Map<String, Object> map = new HashMap<>();
+        map.put("creator_id", userId);
         return treeHoleMapper.selectByMap(map);
     }
 

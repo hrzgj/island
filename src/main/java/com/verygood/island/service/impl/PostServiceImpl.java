@@ -41,12 +41,12 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     public Post getPostById(int id) {
         log.info("正在查询post中id为{}的数据", id);
         Post post = super.getById(id);
-        if(post==null){
-            log.info("没有id为{}的post",id);
+        if (post == null) {
+            log.info("没有id为{}的post", id);
             throw new BizException("没有该动态");
         }
         log.info("查询id为{}的post{}", id, "成功");
-        post.setView(post.getView()+1);
+        post.setView(post.getView() + 1);
         super.updateById(post);
         return post;
     }
@@ -66,8 +66,23 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     }
 
     @Override
-    public int deletePostById(int id) {
+    public int deletePostById(int id, Integer userId) {
         log.info("正在删除id为{}的post", id);
+
+        // 查看权限
+        Post post = super.getById(id);
+
+        if (post == null){
+            log.info("执行删除海岛动态时传输了错误的id【{}】， 该id找不到对应的海岛动态", id);
+            throw new BizException("请校验对应的海岛动态id");
+        }
+
+        if (!post.getUserId().equals(userId)){
+            log.info("执行删除海岛动态时，删除人【{}】并非海岛动态属于者【{}】", userId, post.getUserId());
+            throw new BizException("删除海岛动态失败！您并非该海岛动态的发送者");
+        }
+
+        // 执行删除操作
         if (super.removeById(id)) {
             log.info("删除id为{}的post成功", id);
             return id;
@@ -92,11 +107,11 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     @Override
     public List<Post> getByUserId(Integer id) {
         log.info("正在查询userId为{}的post列表数据", id);
-        Map<String,Object> map=new HashMap<>();
-        map.put("user_id",id);
-        List<Post> posts=super.listByMap(map);
-        if(posts==null){
-            log.info("userId为{}的没有post",id);
+        Map<String, Object> map = new HashMap<>();
+        map.put("user_id", id);
+        List<Post> posts = super.listByMap(map);
+        if (posts == null) {
+            log.info("userId为{}的没有post", id);
             return null;
         }
         return posts;

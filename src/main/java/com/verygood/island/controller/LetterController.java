@@ -34,11 +34,11 @@ public class LetterController {
     public ResultBean<?> listByPage(@RequestParam(name = "page", defaultValue = "1") int page,
                                     @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
                                     @RequestParam(name = "friendId") Integer friendId) {
-        User user= (User) SecurityUtils.getSubject().getPrincipal();
-        if(user==null){
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
-        return new ResultBean<>(letterService.listLettersByPage(page, pageSize, friendId,user.getUserId()));
+        return new ResultBean<>(letterService.listLettersByPage(page, pageSize, friendId, user.getUserId()));
     }
 
 
@@ -85,25 +85,25 @@ public class LetterController {
     }
 
     /**
-    *不分页获得一名笔友的信件
+     * 不分页获得一名笔友的信件
      */
-    @RequestMapping(method = RequestMethod.GET,value = "/all")
-    public ResultBean<?> getOneFriendLetter(@RequestParam(name = "friendId") Integer friendId){
-        User user= (User) SecurityUtils.getSubject().getPrincipal();
-        if(user==null){
+    @RequestMapping(method = RequestMethod.GET, value = "/all")
+    public ResultBean<?> getOneFriendLetter(@RequestParam(name = "friendId") Integer friendId) {
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
-        return new ResultBean<>(letterService.getOneFriendLetter(friendId,user.getUserId()));
+        return new ResultBean<>(letterService.getOneFriendLetter(friendId, user.getUserId()));
     }
 
 
     /**
      * 查询草稿箱列表
      */
-    @RequestMapping(method = RequestMethod.GET,value = "/draft")
-    public ResultBean<?> getLetterDraft(){
-        User user= (User) SecurityUtils.getSubject().getPrincipal();
-        if(user==null){
+    @RequestMapping(method = RequestMethod.GET, value = "/draft")
+    public ResultBean<?> getLetterDraft() {
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         return new ResultBean<>(letterService.getLetterDraft(user.getUserId()));
@@ -111,12 +111,13 @@ public class LetterController {
 
     /**
      * 发送时间胶囊
+     *
      * @param letter 时间胶囊
      */
     @RequestMapping(method = RequestMethod.POST, value = "/capsule")
-    public ResultBean<?> sendCapsule(@RequestBody Letter letter){
-        User user = (User)SecurityUtils.getSubject().getPrincipal();
-        if (user == null){
+    public ResultBean<?> sendCapsule(@RequestBody Letter letter) {
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         return new ResultBean<>(letterService.sendCapsuleLetter(letter, user.getUserId()));

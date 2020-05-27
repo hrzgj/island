@@ -34,7 +34,7 @@ public class UserToken extends UsernamePasswordToken implements Serializable {
         return "ok";
     }
 
-    public UserToken(String username, String password ){
+    public UserToken(String username, String password) {
         this.username = username;
         this.password = password.toCharArray();
     }

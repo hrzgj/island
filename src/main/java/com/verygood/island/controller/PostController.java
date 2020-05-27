@@ -51,8 +51,8 @@ public class PostController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Post post) {
-        User user= (User) SecurityUtils.getSubject().getPrincipal();
-        if(user==null){
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         post.setUserId(user.getUserId());
@@ -64,7 +64,11 @@ public class PostController {
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
-        return new ResultBean<>(postService.deletePostById(id));
+        User user = (User)SecurityUtils.getSubject().getPrincipal();
+        if (user == null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(postService.deletePostById(id, user.getUserId()));
     }
 
     /**

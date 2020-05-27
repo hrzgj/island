@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class LetterVo  {
+public class LetterVo {
     /*
     信件
      */

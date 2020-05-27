@@ -19,7 +19,7 @@ public class ParamsFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException, IOException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
 

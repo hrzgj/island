@@ -43,7 +43,7 @@ public class ResultBean<T> implements Serializable {
         this.data = data;
     }
 
-    public ResultBean(String code, T data){
+    public ResultBean(String code, T data) {
         this.code = code;
         this.data = data;
     }
@@ -61,7 +61,7 @@ public class ResultBean<T> implements Serializable {
         this.code = ResultBean.UNSPECIFIED_CODE;
     }
 
-    public ResultBean(BizException e){
+    public ResultBean(BizException e) {
         super();
         this.message = e.getMessage();
         this.code = e.getCode();
