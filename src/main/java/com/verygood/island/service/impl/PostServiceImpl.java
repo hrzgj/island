@@ -66,8 +66,23 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     }
 
     @Override
-    public int deletePostById(int id) {
+    public int deletePostById(int id, Integer userId) {
         log.info("正在删除id为{}的post", id);
+
+        // 查看权限
+        Post post = super.getById(id);
+
+        if (post == null){
+            log.info("执行删除海岛动态时传输了错误的id【{}】， 该id找不到对应的海岛动态", id);
+            throw new BizException("请校验对应的海岛动态id");
+        }
+
+        if (!post.getUserId().equals(userId)){
+            log.info("执行删除海岛动态时，删除人【{}】并非海岛动态属于者【{}】", userId, post.getUserId());
+            throw new BizException("删除海岛动态失败！您并非该海岛动态的发送者");
+        }
+
+        // 执行删除操作
         if (super.removeById(id)) {
             log.info("删除id为{}的post成功", id);
             return id;

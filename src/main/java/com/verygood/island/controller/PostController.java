@@ -64,7 +64,11 @@ public class PostController {
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
-        return new ResultBean<>(postService.deletePostById(id));
+        User user = (User)SecurityUtils.getSubject().getPrincipal();
+        if (user == null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(postService.deletePostById(id, user.getUserId()));
     }
 
     /**
