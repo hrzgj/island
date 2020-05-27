@@ -51,11 +51,12 @@ public interface PostService {
      * 根据id删除Post
      *
      * @param id 需要删除的Post对象的id
+     * @param userId 执行删除的用户id
      * @return 返回被删除的Post对象的id
      * @author chaos
      * @since 2020-05-04
      */
-    int deletePostById(int id);
+    int deletePostById(int id, Integer userId);
 
     /**
      * 根据id更新Post
