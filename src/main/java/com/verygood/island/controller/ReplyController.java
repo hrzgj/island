@@ -51,6 +51,11 @@ public class ReplyController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Reply reply) {
+        User user= (User) SecurityUtils.getSubject().getPrincipal();
+        if(user==null){
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        reply.setWriterId(user.getUserId());
         return new ResultBean<>(replyService.insertReply(reply));
     }
 

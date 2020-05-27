@@ -10,6 +10,7 @@ import com.verygood.island.service.ReplyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements
     @Override
     public int insertReply(Reply reply) {
         log.info("正在插入reply");
+        reply.setTime(LocalDateTime.now());
         if (super.save(reply)) {
             log.info("插入reply成功,id为{}", reply.getReplyId());
             return reply.getReplyId();
