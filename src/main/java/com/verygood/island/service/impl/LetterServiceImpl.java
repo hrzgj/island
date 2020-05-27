@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * <p>
@@ -176,9 +177,25 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
      */
     private void scheduleLetterSending(Letter letter) {
         log.info("正在创建发信任务");
+        User sender = userMapper.selectById(letter.getSenderId());
+
+        //随机选择收件人
+        if (null == letter.getReceiverId()) {
+            log.info("用户选择随机发送信件");
+            List<User> users = UserServiceImpl.getUserList();
+            for (int i = 0; i < users.size(); i++) {
+                //移除自己
+                if (users.get(i).getUserId().equals(sender.getUserId())) {
+                    users.remove(i);
+                }
+            }
+            int index = new Random().nextInt(users.size());
+            User user = users.get(index);
+            log.info("分配到随机用户: user_id = {}  nickname = {} ", user.getUserId(), user.getNickname());
+            letter.setReceiverId(user.getUserId());
+        }
 
         //计算收信时间
-        User sender = userMapper.selectById(letter.getSenderId());
         User receiver = userMapper.selectById(letter.getReceiverId());
         if (sender == null || receiver == null) {
             log.error("缺少寄件人或收件人，无法发信");
