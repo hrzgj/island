@@ -2,8 +2,12 @@ package com.verygood.island.controller;
 
 
 import com.verygood.island.entity.Reply;
+import com.verygood.island.entity.User;
 import com.verygood.island.entity.dto.ResultBean;
+import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.ReplyService;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,8 +51,8 @@ public class ReplyController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Reply reply) {
-        User user= (User) SecurityUtils.getSubject().getPrincipal();
-        if(user==null){
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
             throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
         }
         reply.setWriterId(user.getUserId());
