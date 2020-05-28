@@ -55,20 +55,16 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements
         }
         ReplyVo replyVo=new ReplyVo();
         replyVo.setReply(reply);
-        //设置回复用户头像
-        if(reply.getWriterId()==null){
-            replyVo.setReplyPhoto(null);
+        //设置回复用户头像和昵称
+        if(reply.getWriterId()!=null) {
+            replyVo.setReplyName(userMapper.getNicknameByUserId(reply.getWriterId()));
+            replyVo.setReplyPhoto(userMapper.getPhotoById(reply.getWriterId()));
         }
-        else{
-           replyVo.setReplyPhoto(userMapper.getPhotoById(reply.getWriterId()));
-        }
-        //设置被回复用户头像
-        if(reply.getBeReplyId()==null){
-            replyVo.setBeReplyPhoto(null);
-        }else {
+        //设置被回复用户头像和昵称
+        if(reply.getBeReplyId()!=null) {
             replyVo.setBeReplyPhoto(userMapper.getPhotoById(reply.getBeReplyId()));
+            replyVo.setBeReplyName(userMapper.getNicknameByUserId(reply.getBeReplyId()));
         }
-
         return replyVo;
     }
 

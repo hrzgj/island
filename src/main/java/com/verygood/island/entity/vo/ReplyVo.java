@@ -15,5 +15,7 @@ import lombok.experimental.Accessors;
 public class ReplyVo {
     Reply reply;
     String replyPhoto;
+    String replyName;
     String beReplyPhoto;
+    String beReplyName;
 }
