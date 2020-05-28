@@ -50,7 +50,7 @@ public interface PostService {
     /**
      * 根据id删除Post
      *
-     * @param id 需要删除的Post对象的id
+     * @param id     需要删除的Post对象的id
      * @param userId 执行删除的用户id
      * @return 返回被删除的Post对象的id
      * @author chaos

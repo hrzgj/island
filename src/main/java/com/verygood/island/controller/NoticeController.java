@@ -9,6 +9,7 @@ import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.NoticeService;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -51,6 +52,7 @@ public class NoticeController {
     /**
      * 新增
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Notice notice) {
         return new ResultBean<>(noticeService.insertNotice(notice));
@@ -59,6 +61,7 @@ public class NoticeController {
     /**
      * 删除
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
         return new ResultBean<>(noticeService.deleteNoticeById(id));
@@ -67,6 +70,7 @@ public class NoticeController {
     /**
      * 修改
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody Notice notice) {
         return new ResultBean<>(noticeService.updateNotice(notice));
@@ -75,6 +79,7 @@ public class NoticeController {
     /**
      * 更改消息读状态
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.PUT, value = "/read/{id}")
     public ResultBean<?> readById(@PathVariable("id") Integer id) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();

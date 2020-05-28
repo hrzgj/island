@@ -9,6 +9,7 @@ import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.TreeHoleService;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -49,6 +50,7 @@ public class TreeHoleController {
     /**
      * 新增
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody TreeHole treeHole) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
@@ -62,6 +64,7 @@ public class TreeHoleController {
     /**
      * 删除
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
@@ -74,6 +77,7 @@ public class TreeHoleController {
     /**
      * 修改
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody TreeHole treeHole) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();

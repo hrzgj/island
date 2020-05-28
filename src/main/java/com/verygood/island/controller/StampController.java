@@ -9,6 +9,7 @@ import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.StampService;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -53,6 +54,7 @@ public class StampController {
     /**
      * 新增
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Stamp stamp) {
         return new ResultBean<>(stampService.insertStamp(stamp));
@@ -61,6 +63,7 @@ public class StampController {
     /**
      * 删除
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
         return new ResultBean<>(stampService.deleteStampById(id));
@@ -69,6 +72,7 @@ public class StampController {
     /**
      * 修改
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody Stamp stamp) {
         return new ResultBean<>(stampService.updateStamp(stamp));

@@ -9,6 +9,7 @@ import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.impl.LetterServiceImpl;
 import com.verygood.island.util.BeanUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
  * @author Administrator
  */
 @Slf4j
+@Transactional
 public class CapsuleSendingTask implements Runnable {
 
     /**
