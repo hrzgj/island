@@ -1,15 +1,20 @@
 package com.verygood.island.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.verygood.island.entity.Reply;
+import com.verygood.island.entity.User;
+import com.verygood.island.entity.vo.ReplyVo;
 import com.verygood.island.exception.bizException.BizException;
 import com.verygood.island.mapper.ReplyMapper;
+import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.ReplyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +32,9 @@ import java.util.Map;
 @Service
 public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements ReplyService {
 
+    @Resource
+    private UserMapper userMapper;
+
     @Override
     public Page<Reply> listReplysByPage(int page, int pageSize, String factor) {
         log.info("正在执行分页查询reply: page = {} pageSize = {} factor = {}", page, pageSize, factor);
@@ -38,11 +46,30 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements
     }
 
     @Override
-    public Reply getReplyById(int id) {
+    public ReplyVo getReplyById(int id) {
         log.info("正在查询reply中id为{}的数据", id);
         Reply reply = super.getById(id);
         log.info("查询id为{}的reply{}", id, (null == reply ? "无结果" : "成功"));
-        return reply;
+        if(reply==null){
+            return null;
+        }
+        ReplyVo replyVo=new ReplyVo();
+        replyVo.setReply(reply);
+        //设置回复用户头像
+        if(reply.getWriterId()==null){
+            replyVo.setReplyPhoto(null);
+        }
+        else{
+           replyVo.setReplyPhoto(userMapper.getPhotoById(reply.getWriterId()));
+        }
+        //设置被回复用户头像
+        if(reply.getBeReplyId()==null){
+            replyVo.setBeReplyPhoto(null);
+        }else {
+            replyVo.setBeReplyPhoto(userMapper.getPhotoById(reply.getBeReplyId()));
+        }
+
+        return replyVo;
     }
 
     @Override
