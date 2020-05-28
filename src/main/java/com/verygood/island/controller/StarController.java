@@ -9,6 +9,7 @@ import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.StarService;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -54,6 +55,7 @@ public class StarController {
     /**
      * 根据id星标海岛
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Star star) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
@@ -66,6 +68,7 @@ public class StarController {
     /**
      * 删除
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
         return new ResultBean<>(starService.deleteStarById(id));
@@ -74,6 +77,7 @@ public class StarController {
     /**
      * 修改
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody Star star) {
         return new ResultBean<>(starService.updateStar(star));

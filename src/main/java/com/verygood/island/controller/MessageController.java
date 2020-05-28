@@ -9,6 +9,7 @@ import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.MessageService;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -49,6 +50,7 @@ public class MessageController {
     /**
      * 新增
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Message message) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
@@ -62,6 +64,7 @@ public class MessageController {
     /**
      * 删除
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
         return new ResultBean<>(messageService.deleteMessageById(id));
@@ -70,6 +73,7 @@ public class MessageController {
     /**
      * 修改
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody Message message) {
         return new ResultBean<>(messageService.updateMessage(message));

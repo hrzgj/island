@@ -17,6 +17,7 @@ import com.verygood.island.mapper.StampMapper;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.util.BeanUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
  * @date 2020-05-08
  */
 @Slf4j
+@Transactional
 public class LetterSendingTask implements Runnable {
 
     /**
