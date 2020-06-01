@@ -59,6 +59,7 @@ public class ShiroConfig {
         map.put("/", "anon");
         map.put("/api/user/login", "anon");
         map.put("/island/api/v1/user/login", "anon");
+        map.put("/island/api/v1/user/", "anon");
         map.put("/wx/**", "anon");
         map.put("/css/**", "anon");
         map.put("/js/**", "anon");
