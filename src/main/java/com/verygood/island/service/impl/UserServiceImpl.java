@@ -8,6 +8,7 @@ import com.verygood.island.entity.Stamp;
 import com.verygood.island.entity.User;
 import com.verygood.island.entity.vo.UserVo;
 import com.verygood.island.exception.bizException.BizException;
+import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.mapper.UserMapper;
 import com.verygood.island.service.StampService;
 import com.verygood.island.service.UserService;
@@ -122,6 +123,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 查看自己的信息
         User self = (User) SecurityUtils.getSubject().getPrincipal();
+        if (null == self) {
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
 
         //转成vo类型
         List<User> records = result.getRecords();
