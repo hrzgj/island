@@ -45,7 +45,7 @@ public class GlobalExceptionHandler implements HandlerExceptionResolver {
     @ExceptionHandler(NullPointerException.class)
     public ResultBean<?> nullPointerException(NullPointerException e) {
         e.printStackTrace();
-        return new ResultBean<>(new BizException("错误!参数不匹配"));
+        return new ResultBean<>(new BizException("请求中缺少了必要的参数"));
     }
 
     @ExceptionHandler({com.alibaba.druid.pool.GetConnectionTimeoutException.class})
@@ -63,6 +63,14 @@ public class GlobalExceptionHandler implements HandlerExceptionResolver {
         return new ResultBean<>(new BizException("您上传的文件大小超过限制"));
     }
 
+    @ExceptionHandler(
+            org.springframework.data.redis.connection.PoolException.class)
+    public ResultBean<?> redisException(Exception e) {
+        e.printStackTrace();
+        return new ResultBean<>(new BizException("服务器的redis数据库不可用"));
+    }
+
+
     @ExceptionHandler(Throwable.class)
     public ResultBean<?> unknownException(Throwable e) {
         e.printStackTrace();
@@ -75,7 +83,18 @@ public class GlobalExceptionHandler implements HandlerExceptionResolver {
                     org.springframework.web.bind.MissingServletRequestParameterException.class})
     public ResultBean<?> http400Handler(Exception e) {
         e.printStackTrace();
-        return new ResultBean<>(new BizException("您的请求错误，缺少请求体或格式错误"));
+        if (e instanceof org.springframework.web.method.annotation.MethodArgumentTypeMismatchException) {
+            return new ResultBean<>(new BizException("请求中的数据类型和服务器声明的类型不匹配"));
+        } else if (e.getMessage().contains("Cannot deserialize value of type `java.time.LocalDateTime` from String")) {
+            return new ResultBean<>(new BizException("请求的json数据中的时间格式不正确"));
+        } else if (e.getMessage().contains("JSON parse error")) {
+            return new ResultBean<>(new BizException("请求的json数据格式不正确"));
+        } else if (e.getMessage().contains("Required request body is missing")) {
+            return new ResultBean<>(new BizException("缺少必要的请求体"));
+        } else if (e instanceof org.springframework.web.bind.MissingServletRequestParameterException) {
+            return new ResultBean<>(new BizException("缺少必要的请求参数"));
+        }
+        return new ResultBean<>(new BizException("缺少必要的请求体或请求体格式错误"));
     }
 
     @ExceptionHandler(

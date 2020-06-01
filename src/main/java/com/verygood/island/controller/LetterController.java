@@ -9,6 +9,7 @@ import com.verygood.island.exception.bizException.BizExceptionCodeEnum;
 import com.verygood.island.service.LetterService;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -53,6 +54,7 @@ public class LetterController {
     /**
      * 新增
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody Letter letter) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
@@ -66,6 +68,7 @@ public class LetterController {
     /**
      * 删除
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
         return new ResultBean<>(letterService.deleteLetterById(id));
@@ -74,6 +77,7 @@ public class LetterController {
     /**
      * 修改
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody Letter letter) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
@@ -114,6 +118,7 @@ public class LetterController {
      *
      * @param letter 时间胶囊
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST, value = "/capsule")
     public ResultBean<?> sendCapsule(@RequestBody Letter letter) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();

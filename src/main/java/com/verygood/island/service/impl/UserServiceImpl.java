@@ -50,7 +50,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     StampService stampService;
 
 
-    List<User> users = null;
+    private static List<User> users = null;
 
     /**
      * 用户名的正则表达式：4-16位的字母数字组合（可包含其中一种）
@@ -61,6 +61,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 密码的正则表达式：6-16位的字母数字组合（必须包含字母，数字）
      */
     private final String PASSWORD_PATTERN = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
+
+    public static List<User> getUserList() {
+        if (null == users) {
+            cacheUsers();
+        }
+        return users;
+    }
 
     /**
      * 根据id查询User
@@ -342,13 +349,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Scheduled(cron = "0 15 * * * ?")
-    public void cacheUsers() {
+    public static void cacheUsers() {
+        UserMapper userMapper = com.verygood.island.util.BeanUtils.getBean(UserMapper.class);
         log.info("正在清空缓存的用户数据");
         if (users != null) {
             users.clear();
         }
         log.info("正在缓存用户");
-        users = super.list();
+        users = userMapper.selectList(new QueryWrapper<>());
         log.info("缓存成功：{}条用户数据", users.size());
     }
 }

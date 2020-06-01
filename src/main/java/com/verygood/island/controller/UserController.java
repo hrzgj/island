@@ -10,6 +10,7 @@ import com.verygood.island.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,6 +62,7 @@ public class UserController {
     /**
      * 新增
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public ResultBean<?> insert(@RequestBody User user) {
         return new ResultBean<>(userService.insertUser(user));
@@ -69,6 +71,7 @@ public class UserController {
     /**
      * 删除
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
         return new ResultBean<>(userService.deleteUserById(id));
@@ -77,6 +80,7 @@ public class UserController {
     /**
      * 修改
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.PUT)
     public ResultBean<?> updateById(@RequestBody User user) {
         User principal = (User) SecurityUtils.getSubject().getPrincipal();
@@ -90,6 +94,7 @@ public class UserController {
     /**
      * 登录
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST, value = "/login")
     public ResultBean<?> login(@RequestBody User user, HttpServletResponse response) {
         Subject subject = SecurityUtils.getSubject();
@@ -102,6 +107,7 @@ public class UserController {
     /**
      * 上传头像
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST, value = "/upload")
     public ResultBean<?> uploadIcon(@RequestParam MultipartFile file) {
         Subject subject = SecurityUtils.getSubject();
@@ -115,6 +121,7 @@ public class UserController {
     /**
      * 上传海岛背景
      */
+    @Transactional
     @RequestMapping(method = RequestMethod.POST, value = "/upload/background")
     public ResultBean<?> uploadBackground(@RequestParam MultipartFile file) {
         Subject subject = SecurityUtils.getSubject();

@@ -2,6 +2,7 @@ package com.verygood.island.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.verygood.island.entity.Reply;
+import com.verygood.island.entity.vo.ReplyVo;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public interface ReplyService {
      * @author chaos
      * @since 2020-05-04
      */
-    Reply getReplyById(int id);
+    ReplyVo getReplyById(int id);
 
     /**
      * 插入Reply
