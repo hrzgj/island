@@ -75,5 +75,5 @@ public interface ReplyService {
      * @author cy
      * @since 2020-05-26
      */
-    List<Reply> getByPostId(Integer id);
+    List<ReplyVo> getByPostId(Integer id);
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,13 +107,28 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements
     }
 
     @Override
-    public List<Reply> getByPostId(Integer id) {
+    public List<ReplyVo> getByPostId(Integer id) {
         log.info("正在查询reply中postId为{}的数据", id);
         Map<String, Object> map = new HashMap<>();
         map.put("post_id", id);
-        List<Reply> reply = super.listByMap(map);
-        log.info("postId为{}查询reply完毕: 结果数 = {} ", id, reply.size());
-        return reply;
+        List<Reply> replays = super.listByMap(map);
+        List<ReplyVo> replyVos=new ArrayList<>(replays.size());
+        for(Reply reply:replays){
+            ReplyVo replyVo=new ReplyVo();
+            //设置被回复用户头像和昵称
+            if(reply.getBeReplyId()!=null) {
+                replyVo.setBeReplyPhoto(userMapper.getPhotoById(reply.getBeReplyId()));
+                replyVo.setBeReplyName(userMapper.getNicknameByUserId(reply.getBeReplyId()));
+            }
+            replyVo.setReply(reply);
+            if(reply.getWriterId()!=null) {
+                replyVo.setReplyName(userMapper.getNicknameByUserId(reply.getWriterId()));
+                replyVo.setReplyPhoto(userMapper.getPhotoById(reply.getWriterId()));
+            }
+            replyVos.add(replyVo);
+        }
+        log.info("postId为{}查询reply完毕: 结果数 = {} ", id, replays.size());
+        return replyVos;
     }
 
 }
