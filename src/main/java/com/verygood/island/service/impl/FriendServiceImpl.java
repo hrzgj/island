@@ -86,13 +86,13 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
     @Override
     public int deleteFriendById(int friendId,int userId) {
         log.info("用户id为{}正在删除id为{}的friend", userId,friendId);
-        QueryWrapper<Friend> queryWrapper=new QueryWrapper<Friend>().eq("friend_user_id",friendId).eq("userId",userId);
-        if (friendMapper.delete(queryWrapper)>=0) {
+        QueryWrapper<Friend> queryWrapper=new QueryWrapper<Friend>().eq("friend_user_id",friendId).eq("user_id",userId);
+        if (friendMapper.delete(queryWrapper)>0) {
             log.info("删除id为{}的friend成功", friendId);
             return friendId;
         } else {
-            log.error("删除id为{}的friend失败", friendId);
-            throw new BizException("删除失败[id=" + friendId + "]");
+            log.info("删除id为{}的friend失败,用户id为{}没有该好友", friendId,userId);
+            throw new BizException("删除失败[id=" + friendId + "]"+"用户没有该好友");
         }
     }
 
