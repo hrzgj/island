@@ -104,7 +104,7 @@ public class RedisConfig extends CachingConfigurerSupport {
 
         template.afterPropertiesSet();
 
-        template.setEnableTransactionSupport(true);
+        template.setEnableTransactionSupport(false);
 
         return template;
     }

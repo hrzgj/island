@@ -335,7 +335,10 @@ public class LetterServiceImpl extends ServiceImpl<LetterMapper, Letter> impleme
         if (super.save(letter)) {
             log.info("插入letter成功,id为{}", letter.getLetterId());
             //发送信件
-            scheduledUtils.addTask(letter.getReceiveTime(), new CapsuleSendingTask(letter));
+            boolean addTask = scheduledUtils.addTask(letter.getReceiveTime(), new CapsuleSendingTask(letter));
+            if (!addTask){
+                throw new BizException("发送时间胶囊失败！");
+            }
             return letter.getLetterId();
         } else {
             log.error("插入letter失败");

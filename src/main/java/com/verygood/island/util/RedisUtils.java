@@ -29,7 +29,7 @@ public class RedisUtils {
      * @param score 定时任务启动时间
      * @return boolean 是否设置成功
      */
-    public boolean add(String key, Object value, double score) {
+    public Boolean add(String key, Object value, double score) {
         return redisTemplate.opsForZSet().add(key, value, score);
     }
 
