@@ -55,7 +55,7 @@ public interface FriendService {
      * @author chaos
      * @since 2020-05-04
      */
-    int deleteFriendById(int id);
+    int deleteFriendById(int friendId,int userId);
 
     /**
      * 根据id更新Friend

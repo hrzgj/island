@@ -65,7 +65,11 @@ public class FriendController {
     @Transactional
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResultBean<?> deleteById(@PathVariable("id") Integer id) {
-        return new ResultBean<>(friendService.deleteFriendById(id));
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
+            throw new BizException(BizExceptionCodeEnum.NO_LOGIN);
+        }
+        return new ResultBean<>(friendService.deleteFriendById(id,user.getUserId()));
     }
 
     /**
