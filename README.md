@@ -1,9 +1,5 @@
 # island-drifting-backend
 
-## 歪瑞古德小队Git使用规范
-
-Author：[歪瑞古德小队](https://www.cnblogs.com/misterchaos/p/12766888.html)-黄钰朝
-
 ## 一、Commit规范
 
 **git commit 的格式为：type(scope):subject**
