@@ -54,7 +54,9 @@ public class ScheduledUtils {
     public boolean addTask(LocalDateTime startTime, Runnable runnable) {
 
         Boolean result;
-        result = redisUtils.add(KEY, runnable, startTime.toEpochSecond(ZoneOffset.of(ZONE_OFFSET)));
+        ZoneOffset of = ZoneOffset.of(ZONE_OFFSET);
+        long l = startTime.toEpochSecond(of);
+        result = redisUtils.add(KEY, runnable, l);
         if (result == null){
             return false;
         }
